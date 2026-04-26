@@ -5,6 +5,7 @@
   "description": "Mobile-first AI Study Planner with a local Node foundation for secure AI integration.",
   "scripts": {
     "start": "node server.js",
+    "build": "node scripts/write-runtime-config.js",
     "check": "node --check server.js && node --check database.js && node --check app.js"
   },
   "dependencies": {

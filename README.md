@@ -177,6 +177,46 @@ Recommended production database:
 - PostgreSQL (managed on Render, Railway, Neon, etc.)
 - Supabase (PostgreSQL + managed auth/storage tooling)
 
+## Vercel + Render Deployment
+
+### STEP 1 — Push to GitHub
+
+```powershell
+git add .
+git commit -m "deploy"
+git push
+```
+
+### STEP 2 — Render (backend)
+
+1. Open [Render Dashboard](https://dashboard.render.com/) and click **New +**.
+2. Click **Web Service** and connect your GitHub repo.
+3. Configure:
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+4. In **Environment** add:
+   - `PORT=10000`
+   - `CLIENT_URL=<your-vercel-url>`
+   - Optional (recommended): `ALLOWED_ORIGINS=<your-vercel-url>`
+5. Click **Create Web Service**.
+6. Copy your backend URL (example: `https://studyspark-api.onrender.com`).
+
+### STEP 3 — Vercel (frontend)
+
+1. Open [Vercel Dashboard](https://vercel.com/dashboard) and click **Add New...** -> **Project**.
+2. Import the same GitHub repo.
+3. Set **Build Command** to `npm run build`.
+4. Set **Output Directory** to `.`.
+5. In project **Settings** -> **Environment Variables**, add:
+   - `VITE_API_BASE=<your-render-url>`
+6. Deploy the project and copy your frontend URL.
+
+### Final Public URL flow
+
+- Users open your Vercel URL.
+- Frontend calls `${window.__APP_CONFIG__?.VITE_API_BASE || ""}/api/...`.
+- Render serves backend APIs and returns data to the public frontend.
+
 ## Step 2 Upgrade
 
 The app now includes:
@@ -205,6 +245,19 @@ SQLite tables are initialized on server start in [database.js](C:\Users\Adam\Doc
 - `chat_history`
 - `password_reset_codes`
 - `email_verification_codes`
+
+## Database Mode (Local vs Deploy)
+
+- **Local development (default):** uses SQLite at `data/studyspark.sqlite`.
+- **Prototype mode:** set `STORAGE_MODE=json` to use `data/app-data.json`.
+- **Hosted deployment:** set `DATABASE_URL` for Postgres-ready mode detection.
+
+Current deployment status:
+
+- `DATABASE_URL` is now detected in `database.js`.
+- A database adapter layer exists for core entities (`users`, `sessions`, `subjects`, `plans`, `tasks`, `calendar blocks`).
+- Email normalization is applied in adapter save/find methods.
+- Full Postgres table migration is marked as TODO and SQLite fallback remains active to keep the demo stable and avoid breaking auth/plans/calendar flows.
 
 ## AI Logic
 

@@ -7,7 +7,11 @@ const RECURRING_BLOCKS_STORAGE_KEY = "studyspark-recurring-blocks";
 const ACHIEVEMENTS_STORAGE_KEY = "studyspark-achievements";
 const ASSIGNMENTS_STORAGE_KEY = "studyspark-assignments";
 const REST_DAYS_STORAGE_KEY = "studyspark-rest-days";
-const API_BASE = window.location.protocol === "file:" ? "http://localhost:3000" : "";
+const TELEMETRY_STORAGE_KEY = "studyspark-telemetry-log";
+const API_BASE =
+  window.location.hostname === "localhost"
+    ? "http://localhost:3000"
+    : (window.__APP_CONFIG__ && window.__APP_CONFIG__.VITE_API_BASE) || "";
 const BRAND_NAME = "StudySpark ✨";
 const BRAND_TAGLINE = "Your calm AI study assistant";
 const LOGO_SRC = "assets/studyspark-logo.png";
@@ -881,6 +885,27 @@ function loadCalendarBlocks(email = appState.user?.email) {
 
 function saveCalendarBlocks() {
   localStorage.setItem(getCalendarStorageKey(), JSON.stringify(appState.calendarBlocks));
+}
+
+function telemetry(eventName, details = {}, level = "info") {
+  const entry = {
+    ts: new Date().toISOString(),
+    event: String(eventName || "unknown"),
+    level,
+    details: details || {},
+  };
+  try {
+    const current = JSON.parse(localStorage.getItem(TELEMETRY_STORAGE_KEY) || "[]");
+    const next = [...current, entry].slice(-120);
+    localStorage.setItem(TELEMETRY_STORAGE_KEY, JSON.stringify(next));
+  } catch (error) {
+    // Ignore telemetry persistence failures.
+  }
+  if (level === "error") {
+    console.error(`[telemetry] ${entry.event}`, entry.details);
+  } else {
+    console.info(`[telemetry] ${entry.event}`, entry.details);
+  }
 }
 
 async function initializeApp() {
@@ -2300,8 +2325,8 @@ function renderSubjects() {
         `
           : `
           <div class="empty-state">
-            <h3 style="margin-top:0;">📚 No subjects yet</h3>
-            <p class="subtitle">Add your first subject so StudySpark can build your plan.</p>
+            <h3 style="margin-top:0;">📚 No subjects yet.</h3>
+            <p class="subtitle">Add a subject to start planning.</p>
           </div>
         `
       }
@@ -2409,8 +2434,8 @@ function renderAiScreen() {
               ? messages.map(renderAiMessage).join("")
               : `
                 <div class="empty-state">
-                  <h3 style="margin-top:0;">🤖 Ask StudySpark anything</h3>
-                  <p class="subtitle">Try: make my plan easier, find free study time, or help me focus.</p>
+                  <h3 style="margin-top:0;">🤖 Ask StudySpark anything.</h3>
+                  <p class="subtitle">Try one clear request like “organize my week.”</p>
                 </div>
               `
           }
@@ -2456,12 +2481,12 @@ function renderMyPlan() {
         <div class="screen-header">
           <div class="screen-header__copy">
             <h1 class="title">${escapeHtml(text("planTitle"))}</h1>
-            <p class="subtitle">${escapeHtml(text("noPlanText"))}</p>
+            <p class="subtitle">Add subjects to generate your first plan.</p>
           </div>
         </div>
         <div class="empty-state">
           <h3 style="margin-top:0;">${escapeHtml(text("noPlanYet"))}</h3>
-          <p class="subtitle">${escapeHtml(text("noPlanText"))}</p>
+          <p class="subtitle">Add subjects to generate your first plan.</p>
         </div>
         <button class="btn" data-nav="ai">${escapeHtml(text("openAi"))}</button>
       </section>
@@ -2711,10 +2736,10 @@ function renderAiSchedulePreviewCard() {
   return `
     <article class="card">
       <div class="section-title">
-        <h3>I found these study times for you</h3>
+        <h3>Schedule preview ready.</h3>
         <span class="pill">${preview.events.length} events</span>
       </div>
-      <p class="subtitle">I avoided your school hours and added rest so the plan stays realistic.</p>
+      <p class="subtitle">This preview avoids busy hours and includes rest.</p>
       <div class="calendar-event-list" style="margin-top:10px;">
         ${preview.events
           .slice(0, 8)
@@ -2807,7 +2832,7 @@ function renderCalendar() {
                     `
                   )
                   .join("")
-              : `<div class="empty-state"><h3>🗓️ Nothing planned today</h3><p class="subtitle">Add subjects or busy blocks to organize your week.</p></div>`
+              : `<div class="empty-state"><h3>🗓️ Nothing planned today.</h3><p class="subtitle">Add a block or generate a plan.</p></div>`
           }
         </div>
         <div class="card" style="margin-top:12px;">
@@ -2970,7 +2995,7 @@ function renderCalmCalendar({ monthDays, selectedEvents, selectedStudyHours, fre
                       )
                       .join("")}</details>`
                   : "")
-              : `<div class="empty-state"><h3>🗓️ Nothing planned today</h3><p class="subtitle">Add subjects or busy blocks to organize your week.</p></div>`
+              : `<div class="empty-state"><h3>🗓️ Nothing planned today.</h3><p class="subtitle">Add a block or generate a plan.</p></div>`
           }
         </div>
         <details class="calm-details">
@@ -3776,6 +3801,7 @@ async function applyAiSchedulePreview() {
     return;
   }
   try {
+    telemetry("schedule_apply_started", { previewCount: events.length });
     const existing = [...(appState.calendarBlocks || [])];
     await clearAiGeneratedCalendarBlocks();
     const addedSignatures = new Set();
@@ -3801,9 +3827,11 @@ async function applyAiSchedulePreview() {
     }
     appState.aiSchedulePreview = null;
     await refreshBootstrap();
+    telemetry("schedule_apply_completed", { appliedCount: addedSignatures.size });
     setFlash("Your week is organized.", "success");
     setRoute("calendar");
   } catch (error) {
+    telemetry("schedule_apply_failed", { message: error?.message || "unknown_error" }, "error");
     flashRequestError(error);
     renderApp();
   }
@@ -3882,12 +3910,12 @@ function buildAiSchedulePreview(message = "") {
 function generateSmartWeekDemo() {
   const preview = buildAiSchedulePreview("organize my week");
   if (!preview.events.length) {
-    setFlash("Your day looks full. I found no safe study window. Try light review or move a block.", "warning");
+    setFlash("No safe study window found today; try moving one busy block.", "warning");
     renderApp();
     return;
   }
   appState.aiSchedulePreview = preview;
-  setFlash("I found these study times for you. Review and add when ready.", "info");
+  setFlash("Schedule preview is ready to review.", "info");
   setRoute("calendar");
 }
 
@@ -4165,6 +4193,7 @@ async function generatePlan() {
   setFlash("Building your study plan…", "info");
   renderApp();
   try {
+    telemetry("plan_generate_started", { subjects: appState.subjects.length, assignments: appState.assignments.length });
     await clearAiGeneratedCalendarBlocks();
     await refreshBootstrap();
     let response;
@@ -4195,6 +4224,7 @@ async function generatePlan() {
           ? text("puterPlanReady")
           : "Your plan is ready ✅";
     appState.planGenerating = false;
+    telemetry("plan_generate_completed", { source: response.source || "unknown" });
     setFlash(successMessage, response.warning ? "warning" : "success");
     if (window.confirm("Your plan is ready ✅\n\nWould you like StudySpark to propose calendar time slots for this plan now?")) {
       appState.aiSchedulePreview = buildAiSchedulePreview("make me a study schedule");
@@ -4204,6 +4234,7 @@ async function generatePlan() {
     setRoute("my-plan");
   } catch (error) {
     console.error("Generate Plan failed:", error);
+    telemetry("plan_generate_failed", { message: error?.message || "unknown_error" }, "error");
     appState.planGenerating = false;
     flashRequestError(error);
   }
@@ -4248,6 +4279,7 @@ async function sendCoachMessage(message) {
   const assignmentIntent = /(assignment|project|due)/i.test(messageText);
   const restDays = detectRestDaysFromText(messageText);
   if (scheduleIntent) {
+    telemetry("chat_schedule_intent", { messageLength: messageText.length });
     appState.aiPending = true;
     if (restDays.length) {
       appState.preferredRestDays = [...new Set([...(appState.preferredRestDays || []), ...restDays])];
@@ -4272,7 +4304,8 @@ async function sendCoachMessage(message) {
     const preview = buildAiSchedulePreview(message);
     if (!preview.events.length) {
       appState.aiPending = false;
-      setFlash("Your day looks full. I found no safe study window. Try light review or move a block.", "warning");
+      telemetry("chat_schedule_empty", { messageLength: messageText.length });
+      setFlash("No safe study window found today; try moving one busy block.", "warning");
       return;
     }
     appState.aiSchedulePreview = preview;
@@ -4291,8 +4324,9 @@ async function sendCoachMessage(message) {
         createdDate: new Date().toISOString(),
       },
     ];
-    setFlash("I found these study times for you. Review and add when ready.", "info");
+    setFlash("Schedule preview is ready to review.", "info");
     appState.aiPending = false;
+    telemetry("chat_schedule_preview_ready", { eventCount: preview.events.length });
     setRoute("calendar");
     return;
   }
@@ -4337,11 +4371,13 @@ async function sendCoachMessage(message) {
 
     appState.chatHistory = response.messages || [];
     appState.aiPending = false;
+    telemetry("chat_response_success", { messageLength: messageText.length, responseCount: appState.chatHistory.length });
     setFlash(text("aiMessagesSaved"));
     renderApp();
   } catch (error) {
     appState.aiPending = false;
     appState.chatHistory = appState.chatHistory.filter((entry) => !entry.pending);
+    telemetry("chat_response_failed", { message: error?.message || "unknown_error" }, "error");
     flashRequestError(error);
   }
 }

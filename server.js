@@ -20,9 +20,11 @@ const {
 } = require("./database");
 
 const ROOT_DIR = __dirname;
+loadEnvFile(path.join(ROOT_DIR, ".env"));
+
 const DATA_DIR = path.join(ROOT_DIR, "data");
 const DATA_FILE = path.join(DATA_DIR, "app-data.json");
-const PUBLIC_FILES = new Set(["index.html", "styles.css", "app.js", "README.md"]);
+const PUBLIC_FILES = new Set(["index.html", "styles.css", "app.js", "runtime-config.js", "README.md"]);
 const ASSET_EXTENSIONS = new Map([
   [".png", "image/png"],
   [".svg", "image/svg+xml; charset=utf-8"],
@@ -30,18 +32,19 @@ const ASSET_EXTENSIONS = new Map([
   [".jpeg", "image/jpeg"],
   [".webp", "image/webp"],
 ]);
-const PORT = Number(process.env.PORT || 3000);
+const PORT = process.env.PORT || 3000;
 const MAX_REQUEST_BODY_BYTES = Number(process.env.MAX_REQUEST_BODY_BYTES || 1_000_000);
 const APP_BASE_URL = process.env.APP_BASE_URL || `http://localhost:${PORT}`;
 const IS_PRODUCTION = process.env.NODE_ENV === "production";
+const CLIENT_URL = String(process.env.CLIENT_URL || "").trim();
+const ORIGIN_SOURCE = String(process.env.ALLOWED_ORIGINS || CLIENT_URL || "http://localhost:3000");
+const ALLOW_ALL_ORIGINS = ORIGIN_SOURCE === "*";
 const ALLOWED_ORIGINS = new Set(
-  String(process.env.ALLOWED_ORIGINS || "http://localhost:3000")
+  ORIGIN_SOURCE
     .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean)
 );
-
-loadEnvFile(path.join(ROOT_DIR, ".env"));
 validateEnvironment();
 
 const server = http.createServer(async (req, res) => {
@@ -75,7 +78,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`StudySpark server running at http://localhost:${PORT}`);
+  console.log(`StudySpark server running at ${APP_BASE_URL}`);
   console.log(`SQLite database: ${dbFile}`);
 });
 
@@ -1084,6 +1087,7 @@ function securityHeadersBase() {
   return {
     "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type,X-Session-Token",
+    "Access-Control-Allow-Credentials": "true",
     "Vary": "Origin",
     "Cross-Origin-Resource-Policy": "same-origin",
     "Referrer-Policy": "no-referrer",
@@ -1096,10 +1100,10 @@ function securityHeadersBase() {
 function securityHeadersForRequest(req) {
   const headers = securityHeadersBase();
   const origin = normalizeOrigin(req?.headers?.origin);
-  if (origin && ALLOWED_ORIGINS.has(origin)) {
+  if (origin && (ALLOW_ALL_ORIGINS || ALLOWED_ORIGINS.has(origin))) {
     headers["Access-Control-Allow-Origin"] = origin;
-  } else if (!origin) {
-    headers["Access-Control-Allow-Origin"] = "http://localhost:3000";
+  } else if (!origin && !ALLOW_ALL_ORIGINS) {
+    headers["Access-Control-Allow-Origin"] = [...ALLOWED_ORIGINS][0] || "http://localhost:3000";
   }
   return headers;
 }
@@ -1111,7 +1115,7 @@ function securityHeaders(req) {
 function isOriginAllowed(req) {
   const origin = normalizeOrigin(req?.headers?.origin);
   if (!origin) return true;
-  return ALLOWED_ORIGINS.has(origin);
+  return ALLOW_ALL_ORIGINS || ALLOWED_ORIGINS.has(origin);
 }
 
 function normalizeOrigin(origin) {

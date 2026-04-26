@@ -6,7 +6,24 @@ const DATA_DIR = path.join(__dirname, "data");
 const JSON_DATA_FILE = path.join(DATA_DIR, "app-data.json");
 const DB_FILE = path.join(DATA_DIR, "studyspark.sqlite");
 const STORAGE_MODE = String(process.env.STORAGE_MODE || "sqlite").toLowerCase();
+const DATABASE_URL = String(process.env.DATABASE_URL || "").trim();
 const USE_JSON_PROTOTYPE = STORAGE_MODE === "json";
+const USE_POSTGRES = Boolean(DATABASE_URL) && !USE_JSON_PROTOTYPE;
+let pgPool = null;
+let POSTGRES_READY = false;
+
+if (USE_POSTGRES) {
+  try {
+    // Optional dependency for hosted deployments.
+    const { Pool } = require("pg");
+    pgPool = new Pool({ connectionString: DATABASE_URL, ssl: { rejectUnauthorized: false } });
+    POSTGRES_READY = true;
+  } catch (error) {
+    POSTGRES_READY = false;
+    // TODO(deployment): Implement full Postgres repository + migrations and remove SQLite fallback.
+    console.warn("DATABASE_URL is set but Postgres adapter is not fully enabled. Falling back to SQLite/local mode.", error?.message || "");
+  }
+}
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
 
@@ -281,6 +298,22 @@ function migrateJsonDataIfNeeded() {
 function readState() {
   // Prototype mode keeps local app-data.json writable for quick demos.
   // TODO(deployment): Replace this abstraction with PostgreSQL/Supabase repository methods.
+  if (USE_POSTGRES && POSTGRES_READY) {
+    // TODO(deployment): Return state from Postgres tables once migration is complete.
+    // Temporary safe fallback keeps current behavior stable.
+    return {
+      users: db.prepare("SELECT * FROM users").all().map(mapUser),
+      subjects: db.prepare("SELECT * FROM subjects").all().map(mapSubject),
+      plans: db.prepare("SELECT * FROM plans").all().map(mapPlan),
+      tasks: db.prepare("SELECT * FROM tasks").all().map(mapTask),
+      sessions: db.prepare("SELECT * FROM sessions WHERE invalidated = 0").all().map(mapSession),
+      chatHistory: db.prepare("SELECT * FROM chat_history").all().map(mapChatMessage),
+      calendarBlocks: db.prepare("SELECT * FROM calendar_blocks").all().map(mapCalendarBlock),
+      friends: db.prepare("SELECT * FROM friends").all().map(mapFriend),
+      friendMessages: db.prepare("SELECT * FROM friend_messages").all().map(mapFriendMessage),
+      rewardHistory: db.prepare("SELECT * FROM reward_history").all().map(mapReward)
+    };
+  }
   if (USE_JSON_PROTOTYPE) {
     return readPrototypeJsonState();
   }
@@ -301,6 +334,9 @@ function readState() {
 function writeState(state) {
   // Prototype mode persists to JSON to avoid breaking local dev workflows.
   // TODO(deployment): Replace snapshot rewrites with transactional PostgreSQL/Supabase queries.
+  if (USE_POSTGRES && POSTGRES_READY) {
+    // TODO(deployment): Persist into Postgres transactionally. Keep SQLite fallback for now.
+  }
   if (USE_JSON_PROTOTYPE) {
     writePrototypeJsonState(state);
     return;
@@ -538,6 +574,122 @@ function normalizeEmail(email) {
   return String(email || "").trim().toLowerCase();
 }
 
+function getActiveDatabaseMode() {
+  if (USE_JSON_PROTOTYPE) return "json";
+  if (USE_POSTGRES && POSTGRES_READY) return "postgres-fallback";
+  return "sqlite";
+}
+
+function createUser(userInput = {}) {
+  const state = readState();
+  const email = normalizeEmail(userInput.email);
+  if (!email) return null;
+  const exists = state.users.find((user) => normalizeEmail(user.email) === email);
+  if (exists) return null;
+  const user = { ...userInput, email };
+  state.users.push(user);
+  writeState(state);
+  return user;
+}
+
+function findUserByEmail(email) {
+  const state = readState();
+  const normalized = normalizeEmail(email);
+  return state.users.find((user) => normalizeEmail(user.email) === normalized) || null;
+}
+
+function createSessionRecord(sessionInput = {}) {
+  const state = readState();
+  state.sessions = (state.sessions || []).filter((entry) => entry.userId !== sessionInput.userId);
+  state.sessions.push({ ...sessionInput });
+  writeState(state);
+  return sessionInput;
+}
+
+function findSession(tokenHash) {
+  const state = readState();
+  return (state.sessions || []).find((session) => session.tokenHash === tokenHash && !session.invalidated) || null;
+}
+
+function saveSubject(subjectInput = {}) {
+  const state = readState();
+  const subject = { ...subjectInput, userEmail: normalizeEmail(subjectInput.userEmail) };
+  const idx = state.subjects.findIndex((entry) => entry.id === subject.id);
+  if (idx >= 0) state.subjects[idx] = subject;
+  else state.subjects.push(subject);
+  writeState(state);
+  return subject;
+}
+
+function getSubjects(userEmail) {
+  const state = readState();
+  const normalized = normalizeEmail(userEmail);
+  return (state.subjects || []).filter((subject) => normalizeEmail(subject.userEmail) === normalized);
+}
+
+function savePlan(planInput = {}) {
+  const state = readState();
+  const plan = { ...planInput, userEmail: normalizeEmail(planInput.userEmail) };
+  const idx = state.plans.findIndex((entry) => entry.id === plan.id);
+  if (idx >= 0) state.plans[idx] = plan;
+  else state.plans.push(plan);
+  writeState(state);
+  return plan;
+}
+
+function getPlans(userEmail) {
+  const state = readState();
+  const normalized = normalizeEmail(userEmail);
+  return (state.plans || []).filter((plan) => normalizeEmail(plan.userEmail) === normalized);
+}
+
+function saveTask(taskInput = {}) {
+  const state = readState();
+  const task = { ...taskInput, userEmail: normalizeEmail(taskInput.userEmail) };
+  const idx = state.tasks.findIndex((entry) => entry.id === task.id);
+  if (idx >= 0) state.tasks[idx] = task;
+  else state.tasks.push(task);
+  writeState(state);
+  return task;
+}
+
+function getTasks(userEmail) {
+  const state = readState();
+  const normalized = normalizeEmail(userEmail);
+  return (state.tasks || []).filter((task) => normalizeEmail(task.userEmail) === normalized);
+}
+
+function saveCalendarBlock(blockInput = {}) {
+  const state = readState();
+  const block = { ...blockInput, userEmail: normalizeEmail(blockInput.userEmail) };
+  const idx = (state.calendarBlocks || []).findIndex((entry) => entry.id === block.id);
+  if (idx >= 0) state.calendarBlocks[idx] = block;
+  else state.calendarBlocks.push(block);
+  writeState(state);
+  return block;
+}
+
+function getCalendarBlocks(userEmail) {
+  const state = readState();
+  const normalized = normalizeEmail(userEmail);
+  return (state.calendarBlocks || []).filter((block) => normalizeEmail(block.userEmail) === normalized);
+}
+
+const databaseAdapter = {
+  createUser,
+  findUserByEmail,
+  createSession: createSessionRecord,
+  findSession,
+  saveSubject,
+  getSubjects,
+  savePlan,
+  getPlans,
+  saveTask,
+  getTasks,
+  saveCalendarBlock,
+  getCalendarBlocks,
+};
+
 function mapUser(row) {
   return {
     id: row.id,
@@ -761,6 +913,8 @@ initDatabase();
 
 module.exports = {
   dbFile: DB_FILE,
+  databaseAdapter,
+  getActiveDatabaseMode,
   initDatabase,
   readState,
   writeState,
