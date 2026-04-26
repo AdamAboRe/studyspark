@@ -8,10 +8,7 @@ const ACHIEVEMENTS_STORAGE_KEY = "studyspark-achievements";
 const ASSIGNMENTS_STORAGE_KEY = "studyspark-assignments";
 const REST_DAYS_STORAGE_KEY = "studyspark-rest-days";
 const TELEMETRY_STORAGE_KEY = "studyspark-telemetry-log";
-const API_BASE =
-  window.location.hostname === "localhost"
-    ? "http://localhost:3000"
-    : "https://studyspark-l26x.onrender.com";
+const API_BASE = "https://studyspark-l26x.onrender.com";
 const BRAND_NAME = "StudySpark ✨";
 const BRAND_TAGLINE = "Your calm AI study assistant";
 const LOGO_SRC = "assets/studyspark-logo.png";
