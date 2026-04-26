@@ -5,6 +5,8 @@ const MINI_CHAT_PREVIEW_STORAGE_KEY = "studyspark-mini-chat-preview";
 const PROFILE_AVATAR_STORAGE_KEY = "studyspark-profile-avatar";
 const RECURRING_BLOCKS_STORAGE_KEY = "studyspark-recurring-blocks";
 const ACHIEVEMENTS_STORAGE_KEY = "studyspark-achievements";
+const ASSIGNMENTS_STORAGE_KEY = "studyspark-assignments";
+const REST_DAYS_STORAGE_KEY = "studyspark-rest-days";
 const API_BASE = window.location.protocol === "file:" ? "http://localhost:3000" : "";
 const BRAND_NAME = "StudySpark ✨";
 const BRAND_TAGLINE = "Your calm AI study assistant";
@@ -12,8 +14,8 @@ const LOGO_SRC = "assets/studyspark-logo.png";
 
 const NAV_ITEMS = [
   { key: "home", icon: "🏠", labelKey: "navHome" },
-  { key: "subjects", icon: "📚", labelKey: "navSubjects" },
   { key: "calendar", icon: "🗓️", labelKey: "navCalendar" },
+  { key: "subjects", icon: "📚", labelKey: "navSubjects" },
   { key: "ai", icon: "🤖", labelKey: "navAi" },
   { key: "profile", icon: "👤", labelKey: "navProfile" },
 ];
@@ -74,6 +76,7 @@ const appState = {
   tasks: [],
   calendarBlocks: [],
   selectedCalendarDate: toDateInputValue(new Date()),
+  selectedCalendarHour: 18,
   chatHistory: [],
   rewardHistory: [],
   friends: [],
@@ -84,6 +87,11 @@ const appState = {
   achievementsUnlocked: [],
   achievementPopup: "",
   latestPlan: null,
+  assignments: [],
+  preferredRestDays: [],
+  editingRoutineId: null,
+  currentRoutineDraft: null,
+  planGenerating: false,
   metrics: {
     totalSubjects: 0,
     totalPlans: 0,
@@ -108,6 +116,7 @@ const appState = {
   devVerificationCode: "",
   devResetCode: "",
   aiPending: false,
+  aiSchedulePreview: null,
   flash: "",
   flashTone: "success",
 };
@@ -148,7 +157,7 @@ const translations = {
     navHome: "Home",
     navSubjects: "Subjects",
     navCalendar: "Calendar",
-    navAi: "AI Coach",
+    navAi: "AI",
     navPlan: "My Plan",
     navFocus: "Focus",
     navProfile: "Profile",
@@ -158,7 +167,7 @@ const translations = {
     progress: "📈 Progress",
     addSubject: "📚 Add Subject",
     generatePlan: "🤖 Generate Plan",
-    openAi: "🤖 Open AI Coach",
+    openAi: "Open AI",
     whyItMatters: "Why this app matters",
     subjectsTitle: "📚 Subjects",
     subjectsText: "Track deadlines, difficulty, energy, and priorities in one cozy place.",
@@ -171,7 +180,7 @@ const translations = {
     priority: "Priority",
     dailyHours: "Study Hours per Day",
     notes: "Notes",
-    saveSubject: "Save Subject",
+    saveSubject: "Save and continue",
     easy: "🌿 Easy",
     medium: "⚡ Medium",
     hard: "🔥 Hard",
@@ -252,7 +261,7 @@ const translations = {
     focusSession: "Focus session",
     breakSession: "Break time 🧘",
     focusComplete: "Focus session complete 🎉",
-    start: "Start",
+    start: "Let's start something small",
     pause: "Pause",
     reset: "Reset",
     noFocusTask: "You're clear for now. Pick a subject or generate a plan when you're ready ✨",
@@ -699,6 +708,13 @@ function setFlash(message, tone = "success") {
   }, 2600);
 }
 
+function flashRequestError(error, fallback = "Something went wrong, try again.") {
+  const detail = String(error?.message || "").trim();
+  const isGeneric = !detail || detail === "Request failed.";
+  const message = isGeneric ? `${fallback} Please try again.` : detail;
+  setFlash(message, "error");
+}
+
 function setRoute(route, options = {}) {
   appState.route = route;
   if (options.editingSubjectId !== undefined) {
@@ -738,7 +754,13 @@ function clearSession() {
   appState.devVerificationCode = "";
   appState.devResetCode = "";
   appState.latestPlan = null;
+  appState.assignments = [];
+  appState.preferredRestDays = [];
+  appState.editingRoutineId = null;
+  appState.currentRoutineDraft = null;
+  appState.planGenerating = false;
   appState.aiPending = false;
+  appState.aiSchedulePreview = null;
   appState.focusRunning = false;
   appState.focusIntervalId = null;
   appState.focusMode = "focus";
@@ -758,9 +780,13 @@ function applySession(payload) {
   appState.calendarBlocks = loadCalendarBlocks(payload.user?.email);
   appState.recurringBlocks = loadRecurringBlocks(payload.user?.email);
   appState.achievementsUnlocked = loadAchievements(payload.user?.email);
+  appState.assignments = loadAssignments(payload.user?.email);
   appState.devVerificationCode = payload.devVerificationCode || "";
-  if (payload.requiresVerification || payload.user?.emailVerified === false) {
-    appState.route = "verify-email";
+  // TODO: Re-enable email verification for production.
+  if (!isOnboarded(payload.user)) {
+    appState.route = "onboarding";
+  } else {
+    appState.route = "home";
   }
 }
 
@@ -778,6 +804,14 @@ function getRecurringBlocksStorageKey(email = appState.user?.email) {
 
 function getAchievementsStorageKey(email = appState.user?.email) {
   return `${ACHIEVEMENTS_STORAGE_KEY}:${email || "guest"}`;
+}
+
+function getAssignmentsStorageKey(email = appState.user?.email) {
+  return `${ASSIGNMENTS_STORAGE_KEY}:${email || "guest"}`;
+}
+
+function getRestDaysStorageKey(email = appState.user?.email) {
+  return `${REST_DAYS_STORAGE_KEY}:${email || "guest"}`;
 }
 
 function loadProfileAvatar(email = appState.user?.email) {
@@ -813,6 +847,30 @@ function saveAchievements() {
   localStorage.setItem(getAchievementsStorageKey(), JSON.stringify(appState.achievementsUnlocked || []));
 }
 
+function loadAssignments(email = appState.user?.email) {
+  try {
+    return JSON.parse(localStorage.getItem(getAssignmentsStorageKey(email)) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveAssignments() {
+  localStorage.setItem(getAssignmentsStorageKey(), JSON.stringify(appState.assignments || []));
+}
+
+function loadRestDays(email = appState.user?.email) {
+  try {
+    return JSON.parse(localStorage.getItem(getRestDaysStorageKey(email)) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveRestDays() {
+  localStorage.setItem(getRestDaysStorageKey(), JSON.stringify(appState.preferredRestDays || []));
+}
+
 function loadCalendarBlocks(email = appState.user?.email) {
   try {
     return JSON.parse(localStorage.getItem(getCalendarStorageKey(email)) || "[]");
@@ -832,11 +890,7 @@ async function initializeApp() {
     try {
       await refreshBootstrap();
     } catch (error) {
-      if (error.code === "email_not_verified") {
-        appState.route = "verify-email";
-      } else {
-        clearSession();
-      }
+      clearSession();
     }
   }
   renderApp();
@@ -889,11 +943,10 @@ async function refreshBootstrap() {
   appState.achievementsUnlocked = loadAchievements(payload.user?.email);
   appState.metrics = payload.metrics || appState.metrics;
   appState.latestPlan = appState.plans[0] || null;
+  appState.assignments = loadAssignments(payload.user?.email);
+  appState.preferredRestDays = loadRestDays(payload.user?.email);
   appState.calendarBlocks = payload.calendarBlocks || loadCalendarBlocks();
-  if (appState.user?.emailVerified === false) {
-    appState.route = "verify-email";
-    return;
-  }
+  // TODO: Re-enable email verification for production.
   if (!localStorage.getItem(UI_LANGUAGE_STORAGE_KEY) && appState.user?.preferredLanguage) {
     appState.previewLanguage = appState.user.preferredLanguage;
     localStorage.setItem(UI_LANGUAGE_STORAGE_KEY, appState.previewLanguage);
@@ -1132,18 +1185,26 @@ function getMonthDays(dateValue = appState.selectedCalendarDate) {
 }
 
 function getCalendarBlocksForDate(dateValue) {
-  const direct = appState.calendarBlocks.filter((block) => block.date === dateValue);
+  const direct = appState.calendarBlocks
+    .filter((block) => block.date === dateValue)
+    .map((block) => ({
+      ...block,
+      source: block.source || "manual",
+      repeatRule: block.repeatRule || null,
+    }));
   const recurring = expandRecurringBlocksForDate(dateValue);
   return [...direct, ...recurring];
 }
 
 function getCalendarDayIndicator(events) {
-  if (!events.length) return "🌿";
+  if (!events.length) return "Free";
   const types = new Set(events.map((event) => event.type));
-  if (types.has("exam")) return "📝";
-  if (types.has("study")) return "📚";
-  if (types.has("block")) return "🚫";
-  return "🌿";
+  if (types.has("exam")) return "Exam";
+  if (types.has("assignment")) return "Assignment";
+  if (types.has("study")) return "Study";
+  if (events.some((event) => getCategoryColorTone(event.category) === "rest")) return "Rest";
+  if (types.has("block")) return "Busy";
+  return "Free";
 }
 
 function getRecurringBlockSummary() {
@@ -1181,7 +1242,10 @@ function expandRecurringBlocksForDate(dateValue) {
       if (target > end) return false;
     }
     if (rule.repeat === "daily") return true;
-    if (rule.repeat === "weekly") return start.getDay() === dayIndex;
+    if (rule.repeat === "weekly") {
+      const days = Array.isArray(rule.repeatWeekdays) ? rule.repeatWeekdays : Array.isArray(rule.daysOfWeek) ? rule.daysOfWeek : [start.getDay()];
+      return days.includes(dayIndex);
+    }
     if (rule.repeat === "weekdays") return Array.isArray(rule.repeatWeekdays) && rule.repeatWeekdays.includes(dayIndex);
     return false;
   }).map((rule) => ({
@@ -1192,6 +1256,8 @@ function expandRecurringBlocksForDate(dateValue) {
     endTime: rule.endTime,
     category: rule.category,
     notes: rule.notes,
+    source: "recurring",
+    repeatRule: rule.repeatRule || { type: rule.repeat, daysOfWeek: rule.repeatWeekdays || [] },
     recurring: true,
   }));
 }
@@ -1231,12 +1297,263 @@ function getPlanTasksForDate(dateValue) {
 
 function getBusyWindows(dateValue) {
   return getCalendarBlocksForDate(dateValue)
-    .filter((block) => block.startTime && block.endTime && String(block.category || "").toLowerCase() !== "free")
+    .filter((block) => {
+      if (!block.startTime || !block.endTime) return false;
+      const category = String(block.category || "").toLowerCase();
+      return !["free", "rest", "break", "light review", "free time"].includes(category);
+    })
     .map((block) => ({
       start: parseClock(block.startTime),
       end: parseClock(block.endTime),
       title: block.title,
     }));
+}
+
+function getDateRange(days = 7) {
+  const list = [];
+  const base = new Date();
+  for (let i = 0; i < days; i += 1) {
+    const day = new Date(base);
+    day.setDate(base.getDate() + i);
+    list.push(toDateInputValue(day));
+  }
+  return list;
+}
+
+function getSubjectUrgencyScore(subject) {
+  const days = Math.max(0, daysUntilDate(subject.examDate));
+  const difficulty = subject.difficulty === "Hard" ? 3 : subject.difficulty === "Medium" ? 2 : 1;
+  const priority = subject.priority === "High" ? 3 : subject.priority === "Medium" ? 2 : 1;
+  return (10 - Math.min(9, days)) * 2 + difficulty * 2 + priority * 2;
+}
+
+function getCategoryColorTone(category) {
+  const value = String(category || "").toLowerCase();
+  if (value.includes("exam")) return "exam";
+  if (value.includes("assignment") || value.includes("project")) return "assignment";
+  if (value.includes("study") || value.includes("review") || value.includes("assignment")) return "study";
+  if (value.includes("rest") || value.includes("break") || value.includes("free")) return "rest";
+  if (value.includes("home")) return "home";
+  return "busy";
+}
+
+function getAssignmentsForDate(dateValue) {
+  return (appState.assignments || []).filter((item) => item.dueDate === dateValue);
+}
+
+function createCalendarEvent({
+  title,
+  date,
+  startTime,
+  endTime,
+  category,
+  notes = "",
+  source = "manual",
+  repeatRule = null,
+}) {
+  return {
+    id: `evt_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`,
+    title,
+    date,
+    startTime,
+    endTime,
+    category,
+    notes,
+    source,
+    repeatRule,
+  };
+}
+
+function toClock(minutes) {
+  return `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
+}
+
+function findAvailableSlot(dateValue, durationMinutes, dayOffset, dayHeavyCount) {
+  const busy = getBusyWindows(dateValue);
+  const minStart = 6 * 60;
+  const maxEnd = 23 * 60;
+  const candidateStarts = [];
+  for (let start = minStart; start + durationMinutes <= maxEnd; start += 30) {
+    candidateStarts.push(start);
+  }
+  const rotation = (dayOffset * 90) % candidateStarts.length;
+  for (let i = 0; i < candidateStarts.length; i += 1) {
+    const index = (i + rotation) % candidateStarts.length;
+    const start = candidateStarts[index];
+    const end = start + durationMinutes;
+    if (busy.some((windowItem) => overlapsWindow(start, end, windowItem))) continue;
+    if (dayHeavyCount >= 3 && durationMinutes > 30) continue;
+    return { start, end };
+  }
+  return null;
+}
+
+function generateSmartStudySchedule({
+  subjects,
+  assignments = [],
+  calendarBlocks,
+  recurringBlocks,
+  dailyAvailableHours,
+  requestedHoursPerDay = null,
+  preferredRestDays = [],
+}) {
+  const days = getDateRange(7);
+  const generated = [];
+  const augmentedRecurring = recurringBlocks || [];
+  const availableMinutesPerDay = Math.max(
+    30,
+    Math.round(Number(requestedHoursPerDay || dailyAvailableHours || 1) * 60)
+  );
+  const rankedSubjects = [...subjects]
+    .filter((subject) => subject.subjectName)
+    .sort((a, b) => getSubjectUrgencyScore(b) - getSubjectUrgencyScore(a));
+  const rankedAssignments = [...assignments]
+    .filter((item) => item.title && item.dueDate)
+    .sort((a, b) => daysUntilDate(a.dueDate) - daysUntilDate(b.dueDate));
+
+  const oldRecurring = appState.recurringBlocks;
+  const oldBlocks = appState.calendarBlocks;
+  appState.recurringBlocks = augmentedRecurring;
+  appState.calendarBlocks = calendarBlocks;
+  try {
+    days.forEach((dateValue, dayOffset) => {
+      const dayIndex = new Date(`${dateValue}T12:00:00`).getDay();
+      const isRestDay = preferredRestDays.includes(dayIndex);
+      let dayMinutes = 0;
+      let dayHeavyCount = 0;
+      const subjectPool = rankedSubjects.length ? [...rankedSubjects] : [];
+      if (isRestDay) {
+        generated.push(
+          createCalendarEvent({
+            title: "Rest day 🌿",
+            date: dateValue,
+            startTime: "18:00",
+            endTime: "18:20",
+            category: "Rest",
+            notes: "I kept this day light because recovery helps learning.",
+            source: "ai",
+          })
+        );
+      }
+      while (dayMinutes < availableMinutesPerDay && (subjectPool.length || rankedAssignments.length)) {
+        const nextAssignment = rankedAssignments.find((item) => daysUntilDate(item.dueDate) >= 0 && daysUntilDate(item.dueDate) <= 6 + dayOffset);
+        if (nextAssignment && dayMinutes < availableMinutesPerDay) {
+          const chunkMinutes = Math.max(30, Math.min(60, Number(nextAssignment.estimatedHours || 1) * 30));
+          const slot = findAvailableSlot(dateValue, chunkMinutes, dayOffset + 2, dayHeavyCount);
+          if (slot) {
+            generated.push(
+              createCalendarEvent({
+                title: `${nextAssignment.title} work`,
+                date: dateValue,
+                startTime: toClock(slot.start),
+                endTime: toClock(slot.end),
+                category: "Assignment",
+                notes: "Assignment work session scheduled before due date.",
+                source: "ai",
+              })
+            );
+            dayMinutes += chunkMinutes;
+            if (chunkMinutes >= 50) {
+              const restStart = slot.end;
+              const restEnd = Math.min(restStart + 10, 23 * 60);
+              if (restEnd - restStart >= 10) {
+                generated.push(
+                  createCalendarEvent({
+                    title: "Rest break",
+                    date: dateValue,
+                    startTime: toClock(restStart),
+                    endTime: toClock(restEnd),
+                    category: "Rest",
+                    notes: "I added rest after assignment work.",
+                    source: "ai",
+                  })
+                );
+              }
+            }
+          }
+        }
+        if (!subjectPool.length) break;
+        const subject = subjectPool[dayOffset % subjectPool.length];
+        const baseDuration = isRestDay ? 20 : dayHeavyCount >= 2 ? 25 : 50;
+        const durationMinutes = Math.min(baseDuration, availableMinutesPerDay - dayMinutes);
+        if (durationMinutes < (isRestDay ? 15 : 25)) break;
+        const slot = findAvailableSlot(dateValue, durationMinutes, dayOffset + dayHeavyCount, dayHeavyCount);
+        if (!slot) break;
+
+        generated.push(
+          createCalendarEvent({
+            title: `${subject.subjectName} study`,
+            date: dateValue,
+            startTime: toClock(slot.start),
+            endTime: toClock(slot.end),
+            category: subject.examDate === dateValue ? "Exam review" : "Study session",
+            notes: "AI planned around your commitments.",
+            source: "ai",
+          })
+        );
+
+        if (durationMinutes >= 50) {
+          const restStart = slot.end;
+          const restEnd = Math.min(restStart + 10, 23 * 60);
+          if (restEnd - restStart >= 10) {
+            generated.push(
+              createCalendarEvent({
+                title: "Rest break",
+                date: dateValue,
+                startTime: toClock(restStart),
+                endTime: toClock(restEnd),
+                category: "Rest",
+                notes: "I added rest so the plan stays realistic.",
+                source: "ai",
+              })
+            );
+          }
+        }
+
+        dayMinutes += durationMinutes;
+        dayHeavyCount += durationMinutes >= 45 ? 1 : 0;
+        if (dayHeavyCount >= 2 && dayMinutes < availableMinutesPerDay) {
+          const longRestSlot = findAvailableSlot(dateValue, 20, dayOffset + 3, dayHeavyCount);
+          if (longRestSlot) {
+            generated.push(
+              createCalendarEvent({
+                title: "Brain reset",
+                date: dateValue,
+                startTime: toClock(longRestSlot.start),
+                endTime: toClock(longRestSlot.end),
+                category: "Rest",
+                notes: "This day looks full, so I kept it light.",
+                source: "ai",
+              })
+            );
+          }
+        }
+        if (requestedHoursPerDay && dayMinutes >= availableMinutesPerDay) break;
+      }
+    });
+    rankedAssignments.forEach((assignment) => {
+      const reminderDate = new Date(`${assignment.dueDate}T12:00:00`);
+      reminderDate.setDate(reminderDate.getDate() - 1);
+      const reminderKey = toDateInputValue(reminderDate);
+      if (days.includes(reminderKey)) {
+        generated.push(
+          createCalendarEvent({
+            title: `${assignment.title} final reminder`,
+            date: reminderKey,
+            startTime: "19:00",
+            endTime: "19:20",
+            category: "Assignment",
+            notes: "Final reminder before due date.",
+            source: "ai",
+          })
+        );
+      }
+    });
+  } finally {
+    appState.recurringBlocks = oldRecurring;
+    appState.calendarBlocks = oldBlocks;
+  }
+  return generated;
 }
 
 function overlapsWindow(start, end, windowItem) {
@@ -1285,13 +1602,29 @@ function getCalendarEventsForDate(dateValue) {
     }
   }
 
+  for (const assignment of getAssignmentsForDate(dateValue)) {
+    events.push({
+      id: assignment.id,
+      type: "assignment",
+      tone: "assignment",
+      source: "manual",
+      label: `📌 ${assignment.title}`,
+      meta: `Due • ${assignment.subject} • ${assignment.priority}`,
+      notes: assignment.notes || "",
+      category: "Assignment",
+    });
+  }
+
   for (const block of getCalendarBlocksForDate(dateValue)) {
     events.push({
       type: "block",
+      tone: getCategoryColorTone(block.category),
       id: block.id,
-      label: `${block.category || text("busyBlock")} ${block.title}`,
+      source: block.source || (block.recurring ? "recurring" : "manual"),
+      label: `${block.title}`,
       meta: `${block.startTime || ""}${block.endTime ? `-${block.endTime}` : ""}`,
       notes: block.notes,
+      category: block.category || "Busy",
     });
   }
 
@@ -1300,6 +1633,8 @@ function getCalendarEventsForDate(dateValue) {
     usedWindows.push({ start: assigned.start, end: assigned.end });
     events.push({
       type: "study",
+      tone: "study",
+      source: "ai",
       label: `📚 ${task.subject}`,
       meta: `${formatTimeRange(assigned.start, task.duration)} • ${formatHours(task.duration)} • ${formatPriority(task.priority)}`,
       conflict: assigned.conflict,
@@ -1423,8 +1758,15 @@ async function puterChat(prompt) {
 
 function renderFlash() {
   if (!appState.flash) return "";
-  const className = appState.flashTone === "warning" ? "alert" : "message-banner";
-  return `<div class="${className}">${escapeHtml(appState.flash)}</div>`;
+  const toneClass =
+    appState.flashTone === "error"
+      ? "toast toast--error"
+      : appState.flashTone === "warning"
+        ? "toast toast--warning"
+        : appState.flashTone === "info"
+          ? "toast toast--info"
+          : "toast toast--success";
+  return `<div class="${toneClass}">${escapeHtml(appState.flash)}</div>`;
 }
 
 function renderBrandMark(size = "small") {
@@ -1522,7 +1864,8 @@ function renderAuthScreen(type) {
               : ""
           }
           <button class="btn" type="submit">${escapeHtml(register ? text("signUp") : text("logIn"))}</button>
-          <button class="btn btn-secondary" type="button" data-action="google-login">Continue with Google</button>
+          <button class="btn btn-secondary" type="button" disabled aria-disabled="true">Continue with Google — Coming soon</button>
+          <p class="helper">Google sign-in is planned for the full version.</p>
         </form>
         <p class="helper" style="margin-top:16px;">
           ${
@@ -1795,9 +2138,8 @@ function renderCalmHome({ nextExam, progress, focusTask, game }) {
     <section class="screen">
       <div class="screen-header screen-header--quiet">
         <div class="screen-header__copy">
-          <span class="pill">${escapeHtml(text("greeting"))}</span>
-          <h1 class="title">${escapeHtml(BRAND_NAME)}</h1>
-          <p class="subtitle">${escapeHtml(BRAND_TAGLINE)}</p>
+          ${renderBrandMark("small")}
+          <p class="subtitle">${escapeHtml(text("nextSmallStep", "Let’s take the next small step."))}</p>
         </div>
         <button class="top-avatar top-avatar--home" data-nav="profile" aria-label="Open Profile">
           ${
@@ -1814,8 +2156,7 @@ function renderCalmHome({ nextExam, progress, focusTask, game }) {
           <span class="pill">${escapeHtml(focusTask ? localizedStatus(focusTask.status) : text("freeDay"))}</span>
         </div>
         <strong class="summary-primary">${escapeHtml(focusTask ? focusTask.subject : text("freeDay"))}</strong>
-        <p class="subtitle">${escapeHtml(focusTask ? `${formatHours(focusTask.duration)} · ${text("nextSmallStep", "Let’s take the next small step 🌱")}` : text("noTasksToday"))}</p>
-        <button class="btn" data-nav="focus">${escapeHtml(text("focusModeButton"))}</button>
+        <p class="subtitle">${escapeHtml(focusTask ? `${formatHours(focusTask.duration)} · ${text("oneSession", "One focused session is enough to make progress.")}` : text("noTasksToday"))}</p>
       </article>
       <div class="calm-grid">
         <article class="card quiet-card">
@@ -1840,27 +2181,10 @@ function renderCalmHome({ nextExam, progress, focusTask, game }) {
       <article class="card">
         <div class="section-title"><h3>${escapeHtml(text("quickActions"))}</h3></div>
         <div class="quick-action-grid quick-action-grid--calm">
-          <button class="btn-secondary" data-nav="add-subject">${escapeHtml(text("addSubject"))}</button>
-          <button class="btn-secondary" data-action="generate-plan-inline">${escapeHtml(text("generatePlan"))}</button>
-          <button class="btn-secondary" data-nav="my-plan">${escapeHtml(text("navPlan"))}</button>
-          <button class="btn-secondary" data-nav="calendar">${escapeHtml(text("openCalendar"))}</button>
-          <button class="btn-secondary" data-nav="focus">${escapeHtml(text("focusModeButton"))}</button>
-          <button class="btn" data-nav="ai">${escapeHtml(text("openAi"))}</button>
+          <button class="btn" data-nav="focus">Start Focus ⏱️</button>
+          <button class="btn-secondary" data-action="generate-plan-inline" ${appState.planGenerating ? "disabled" : ""}>${appState.planGenerating ? "Building your study plan…" : "Generate Plan ✨"}</button>
+          <button class="btn-secondary" data-nav="calendar">Open Calendar 🗓️</button>
         </div>
-      </article>
-      <article class="card mini-chat-widget mini-chat-widget--compact">
-        <div class="section-title">
-          <h3>${escapeHtml(text("askStudySparkMini"))}</h3>
-          <button class="icon-btn" data-nav="ai">${escapeHtml(text("openFullChat"))}</button>
-        </div>
-        <form class="ai-chat__form" data-form="home-mini-chat">
-          <textarea name="message" placeholder="${escapeHtml(text("miniChatPlaceholder"))}" ${appState.aiPending ? "disabled" : ""} required></textarea>
-          <div class="surface-actions surface-actions--two">
-            <span class="microcopy">${escapeHtml(text("miniReplyPreview"))}</span>
-            <button class="btn" type="submit" ${appState.aiPending ? "disabled" : ""}>${escapeHtml(text("send"))}</button>
-          </div>
-        </form>
-        <p class="subtitle mini-chat-preview">${escapeHtml(appState.miniChatPreview || text("aiEmptyText"))}</p>
       </article>
     </section>
   `;
@@ -1933,7 +2257,7 @@ function renderSubjects() {
             ${appState.subjects
               .map(
                 (subject) => `
-                <article class="subject-card">
+                <article class="subject-card subject-card--priority-${String(subject.priority || "medium").toLowerCase()}">
                   <div class="subject-card__top">
                     <div>
                       <h3>${escapeHtml(subject.subjectName)}</h3>
@@ -1958,8 +2282,8 @@ function renderSubjects() {
         `
           : `
           <div class="empty-state">
-            <h3 style="margin-top:0;">${escapeHtml(text("noSubjects"))}</h3>
-            <p class="subtitle">${escapeHtml(text("noSubjectsText"))}</p>
+            <h3 style="margin-top:0;">📚 No subjects yet</h3>
+            <p class="subtitle">Add your first subject so StudySpark can build your plan.</p>
           </div>
         `
       }
@@ -2067,8 +2391,8 @@ function renderAiScreen() {
               ? messages.map(renderAiMessage).join("")
               : `
                 <div class="empty-state">
-                  <h3 style="margin-top:0;">${escapeHtml(text("aiEmptyTitle"))}</h3>
-                  <p class="subtitle">${escapeHtml(text("aiEmptyText"))}</p>
+                  <h3 style="margin-top:0;">🤖 Ask StudySpark anything</h3>
+                  <p class="subtitle">Try: make my plan easier, find free study time, or help me focus.</p>
                 </div>
               `
           }
@@ -2328,6 +2652,71 @@ function renderFocusMode() {
   `;
 }
 
+function renderDayTimeline(events) {
+  const hourRows = [];
+  for (let hour = 6; hour <= 23; hour += 1) {
+    const hourStart = hour * 60;
+    const hourEnd = hourStart + 60;
+    const rowEvents = events.filter((event) => {
+      const start = parseClock(event.startTime || "00:00");
+      const end = parseClock(event.endTime || "00:00");
+      return start < hourEnd && end > hourStart;
+    });
+    hourRows.push(`
+      <div class="day-hour-row">
+        <button class="day-hour-label" data-calendar-hour="${hour}">${String(hour).padStart(2, "0")}:00</button>
+        <div class="day-hour-events">
+          ${
+            rowEvents.length
+              ? rowEvents
+                  .map(
+                    (event) => `<button class="day-event-block day-event-block--${escapeHtml(event.tone || getCategoryColorTone(event.category))} ${event.source === "ai" ? "day-event-block--ai" : ""}" data-event-id="${escapeHtml(event.id || "")}" data-event-source="${escapeHtml(event.source || "")}" data-event-category="${escapeHtml(event.category || "")}">
+                    <strong>${escapeHtml(event.title || event.label)}</strong>
+                    <span>${escapeHtml(event.startTime || "")}-${escapeHtml(event.endTime || "")}</span>
+                  </button>`
+                  )
+                  .join("")
+              : `<button class="day-hour-empty" data-calendar-hour="${hour}">+ Add event</button>`
+          }
+        </div>
+      </div>
+    `);
+  }
+  return `<div class="day-timeline">${hourRows.join("")}</div>`;
+}
+
+function renderAiSchedulePreviewCard() {
+  if (!appState.aiSchedulePreview || !Array.isArray(appState.aiSchedulePreview.events) || !appState.aiSchedulePreview.events.length) {
+    return "";
+  }
+  const preview = appState.aiSchedulePreview;
+  return `
+    <article class="card">
+      <div class="section-title">
+        <h3>I found these study times for you</h3>
+        <span class="pill">${preview.events.length} events</span>
+      </div>
+      <p class="subtitle">I avoided your school hours and added rest so the plan stays realistic.</p>
+      <div class="calendar-event-list" style="margin-top:10px;">
+        ${preview.events
+          .slice(0, 8)
+          .map(
+            (event) => `<div class="calendar-event calendar-event--${escapeHtml(getCategoryColorTone(event.category))}">
+            <strong>${escapeHtml(event.title)}</strong>
+            <span>${escapeHtml(event.date)} · ${escapeHtml(event.startTime)}-${escapeHtml(event.endTime)}</span>
+          </div>`
+          )
+          .join("")}
+      </div>
+      <div class="surface-actions surface-actions--three" style="margin-top:12px;">
+        <button class="btn" data-action="apply-ai-schedule">Add to Calendar</button>
+        <button class="btn-secondary" data-action="edit-ai-schedule">Edit First</button>
+        <button class="btn-secondary" data-action="dismiss-ai-schedule">Not Now</button>
+      </div>
+    </article>
+  `;
+}
+
 function renderCalendar() {
   const monthDays = getMonthDays();
   const selectedEvents = getCalendarEventsForDate(appState.selectedCalendarDate);
@@ -2390,7 +2779,7 @@ function renderCalendar() {
               ? selectedEvents
                   .map(
                     (event) => `
-                      <div class="calendar-event calendar-event--${event.type}">
+                      <div class="calendar-event calendar-event--${event.tone || event.type}">
                         <strong>${escapeHtml(event.label)}</strong>
                         <span>${escapeHtml(event.meta || "")}</span>
                         ${event.conflict ? `<em>${escapeHtml(text("timeConflict"))}</em>` : ""}
@@ -2400,7 +2789,7 @@ function renderCalendar() {
                     `
                   )
                   .join("")
-              : `<div class="empty-state"><h3>${escapeHtml(text("freeDay"))}</h3><p class="subtitle">${escapeHtml(text("nextRightStep"))}</p></div>`
+              : `<div class="empty-state"><h3>🗓️ Nothing planned today</h3><p class="subtitle">Add subjects or busy blocks to organize your week.</p></div>`
           }
         </div>
         <div class="card" style="margin-top:12px;">
@@ -2430,11 +2819,11 @@ function renderCalendar() {
           <div class="surface-actions surface-actions--two">
             <div class="field">
               <label for="blockStart">${escapeHtml(text("blockStart"))}</label>
-              <input id="blockStart" name="startTime" type="time" required />
+              <input id="blockStart" name="startTime" type="time" required value="${escapeHtml(`${String(appState.selectedCalendarHour).padStart(2, "0")}:00`)}" />
             </div>
             <div class="field">
               <label for="blockEnd">${escapeHtml(text("blockEnd"))}</label>
-              <input id="blockEnd" name="endTime" type="time" required />
+              <input id="blockEnd" name="endTime" type="time" required value="${escapeHtml(`${String(Math.min(23, appState.selectedCalendarHour + 1)).padStart(2, "0")}:00`)}" />
             </div>
           </div>
           <div class="field">
@@ -2475,6 +2864,25 @@ function renderCalendar() {
 
 function renderCalmCalendar({ monthDays, selectedEvents, selectedStudyHours, freeWindows, hasNoWindowTask, selectedMonth, blockTypes }) {
   const recurringSummary = getRecurringBlockSummary();
+  const selectedDayBlocks = getCalendarBlocksForDate(appState.selectedCalendarDate).map((block) => ({
+    ...block,
+    tone: getCategoryColorTone(block.category),
+  }));
+  const selectedAssignments = getAssignmentsForDate(appState.selectedCalendarDate).map((item) => ({
+    id: item.id,
+    title: item.title,
+    date: item.dueDate,
+    startTime: "17:00",
+    endTime: "17:30",
+    category: "Assignment",
+    notes: item.notes || "",
+    source: "manual",
+    tone: "assignment",
+  }));
+  const aiPreviewDayBlocks = (appState.aiSchedulePreview?.events || [])
+    .filter((event) => event.date === appState.selectedCalendarDate)
+    .map((event) => ({ ...event, tone: getCategoryColorTone(event.category) }));
+  const dayTimelineEvents = [...selectedDayBlocks, ...selectedAssignments, ...aiPreviewDayBlocks];
   return `
     <section class="screen">
       <div class="screen-header screen-header--quiet">
@@ -2520,7 +2928,7 @@ function renderCalmCalendar({ monthDays, selectedEvents, selectedStudyHours, fre
               ? selectedEvents
                   .map(
                     (event) => `
-                      <div class="calendar-event calendar-event--${event.type}">
+                      <div class="calendar-event calendar-event--${event.tone || event.type}">
                         <strong>${escapeHtml(event.label)}</strong>
                         <span>${escapeHtml(event.meta || "")}</span>
                         ${event.conflict ? `<em>${escapeHtml(text("timeConflict"))}</em>` : ""}
@@ -2530,7 +2938,7 @@ function renderCalmCalendar({ monthDays, selectedEvents, selectedStudyHours, fre
                     `
                   )
                   .join("")
-              : `<div class="empty-state"><h3>${escapeHtml(text("freeDay"))}</h3><p class="subtitle">${escapeHtml(text("nextRightStep"))}</p></div>`
+              : `<div class="empty-state"><h3>🗓️ Nothing planned today</h3><p class="subtitle">Add subjects or busy blocks to organize your week.</p></div>`
           }
         </div>
         <details class="calm-details">
@@ -2553,6 +2961,129 @@ function renderCalmCalendar({ monthDays, selectedEvents, selectedStudyHours, fre
           ? `<details class="card calm-details calm-details--card"><summary>${escapeHtml(text("recurringBlocksTitle", "Recurring blocks"))}</summary>${recurringSummary.map((item) => `<p class="subtitle">${escapeHtml(item)}</p>`).join("")}</details>`
           : ""
       }
+      ${renderAiSchedulePreviewCard()}
+      <details class="card calm-details calm-details--card" open>
+        <summary>Day view</summary>
+        ${renderDayTimeline(dayTimelineEvents)}
+      </details>
+      <details class="card calm-details calm-details--card">
+        <summary>Weekly Routine</summary>
+        <form class="field-grid" data-form="weekly-routine" style="margin-top:14px;">
+          <div class="field">
+            <label for="routineTitle">Routine title</label>
+            <input id="routineTitle" name="title" required value="${escapeHtml(appState.currentRoutineDraft?.title || "")}" />
+          </div>
+          <div class="field">
+            <label>Days of week</label>
+            <div class="quick-actions">
+              ${["0", "1", "2", "3", "4", "5", "6"].map((day) => `<label class="quick-chip"><input type="checkbox" name="daysOfWeek" value="${day}" ${(appState.currentRoutineDraft?.daysOfWeek || []).includes(Number(day)) ? "checked" : ""} />${escapeHtml(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][Number(day)])}</label>`).join("")}
+            </div>
+          </div>
+          <div class="surface-actions surface-actions--two">
+            <div class="field">
+              <label for="routineStart">Start time</label>
+              <input id="routineStart" name="startTime" type="time" required value="${escapeHtml(appState.currentRoutineDraft?.startTime || "")}" />
+            </div>
+            <div class="field">
+              <label for="routineEnd">End time</label>
+              <input id="routineEnd" name="endTime" type="time" required value="${escapeHtml(appState.currentRoutineDraft?.endTime || "")}" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="routineCategory">Category</label>
+            <select id="routineCategory" name="category">
+              ${blockTypes.map((type) => `<option value="${escapeHtml(type)}" ${appState.currentRoutineDraft?.category === type ? "selected" : ""}>${escapeHtml(type)}</option>`).join("")}
+            </select>
+          </div>
+          <div class="field">
+            <label for="routineNotes">Notes</label>
+            <textarea id="routineNotes" name="notes">${escapeHtml(appState.currentRoutineDraft?.notes || "")}</textarea>
+          </div>
+          <div class="surface-actions surface-actions--two">
+            <button class="btn" type="submit">${appState.editingRoutineId ? "Update routine" : "Save routine"}</button>
+            ${appState.editingRoutineId ? `<button class="btn-secondary" type="button" data-action="cancel-routine-edit">Cancel edit</button>` : ""}
+          </div>
+        </form>
+        <div class="stack" style="margin-top:12px;">
+          ${(appState.recurringBlocks || []).map((rule) => `<article class="friend-card">
+            <strong>${escapeHtml(rule.title)}</strong>
+            <p class="subtitle">${escapeHtml((rule.repeatWeekdays || []).map(getWeekdayName).join(", "))}</p>
+            <p class="microcopy">${escapeHtml(rule.startTime)}-${escapeHtml(rule.endTime)} • ${escapeHtml(rule.category)}</p>
+            <p class="microcopy">${escapeHtml(rule.notes || "")}</p>
+            <div class="surface-actions surface-actions--two">
+              <button class="btn-secondary" type="button" data-action="edit-routine" data-routine-id="${escapeHtml(rule.id)}">Edit</button>
+              <button class="btn-secondary danger" type="button" data-action="delete-routine" data-routine-id="${escapeHtml(rule.id)}">Delete</button>
+            </div>
+          </article>`).join("")}
+        </div>
+        <div class="surface-actions surface-actions--two" style="margin-top:12px;">
+          <button class="btn-secondary" data-action="demo-school-routine">Add my school routine</button>
+          <button class="btn-secondary" data-action="demo-smart-week">Generate smart study week</button>
+        </div>
+      </details>
+      <details class="card calm-details calm-details--card">
+        <summary>Preferred rest days</summary>
+        <form class="field-grid" data-form="rest-days" style="margin-top:14px;">
+          <div class="quick-actions">
+            ${["0", "1", "2", "3", "4", "5", "6"].map((day) => `<label class="quick-chip"><input type="checkbox" name="restDays" value="${day}" ${(appState.preferredRestDays || []).includes(Number(day)) ? "checked" : ""} />${escapeHtml(getWeekdayName(day).slice(0, 3))}</label>`).join("")}
+          </div>
+          <button class="btn" type="submit">Save and continue</button>
+        </form>
+      </details>
+      <details class="card calm-details calm-details--card">
+        <summary>Add Assignment 📌</summary>
+        <form class="field-grid" data-form="assignment" style="margin-top:14px;">
+          <div class="field">
+            <label for="assignmentTitle">Title</label>
+            <input id="assignmentTitle" name="title" required />
+          </div>
+          <div class="field">
+            <label for="assignmentSubject">Subject</label>
+            <input id="assignmentSubject" name="subject" required />
+          </div>
+          <div class="field">
+            <label for="assignmentDueDate">Due date</label>
+            <input id="assignmentDueDate" name="dueDate" type="date" required />
+          </div>
+          <div class="surface-actions surface-actions--two">
+            <div class="field">
+              <label for="assignmentHours">Estimated hours</label>
+              <input id="assignmentHours" name="estimatedHours" type="number" min="0.5" max="20" step="0.5" required />
+            </div>
+            <div class="field">
+              <label for="assignmentStatus">Status</label>
+              <select id="assignmentStatus" name="status">
+                <option value="not started">Not started</option>
+                <option value="in progress">In progress</option>
+                <option value="done">Done</option>
+              </select>
+            </div>
+          </div>
+          <div class="surface-actions surface-actions--two">
+            <div class="field">
+              <label for="assignmentPriority">Priority</label>
+              <select id="assignmentPriority" name="priority">
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="assignmentDifficulty">Difficulty</label>
+              <select id="assignmentDifficulty" name="difficulty">
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="assignmentNotes">Notes</label>
+            <textarea id="assignmentNotes" name="notes"></textarea>
+          </div>
+          <button class="btn" type="submit">Save and continue</button>
+        </form>
+      </details>
       <details class="card calm-details calm-details--card">
         <summary>${escapeHtml(text("addCalendarBlock"))}</summary>
         <form class="field-grid" data-form="calendar-block" style="margin-top:14px;">
@@ -2729,8 +3260,8 @@ function renderCalmProfile(game, focus) {
       </div>
       ${renderFlash()}
 
-      <article class="card profile-section">
-        <div class="section-title"><h3>${escapeHtml(text("accountSection"))}</h3></div>
+      <details class="card calm-details calm-details--card" open>
+        <summary>Account 👤</summary>
         <div class="profile-avatar-wrap profile-avatar-wrap--small avatar-preview">
           ${
             appState.profileAvatar
@@ -2745,19 +3276,23 @@ function renderCalmProfile(game, focus) {
           ${renderProfileRow(text("studyGoal"), appState.user?.studyGoal)}
           ${renderProfileRow(text("dailyAvailableHours"), appState.user?.dailyAvailableHours)}
         </div>
-      </article>
+      </details>
 
-      <article class="card profile-section">
-        <div class="section-title"><h3>${escapeHtml(text("progressSection"))}</h3></div>
+      <details class="card calm-details calm-details--card" open>
+        <summary>Progress 📊</summary>
         <div class="profile-list">
           ${renderProfileRow(text("totalSubjects"), appState.metrics.totalSubjects)}
           ${renderProfileRow(text("completedTasks"), `${appState.metrics.completedTasks}/${game.totalTasks}`)}
           ${renderProfileRow(text("completedPercent"), `${game.completedPercent}%`)}
           ${renderProfileRow(text("savedPlans"), appState.metrics.totalPlans)}
+          ${renderProfileRow(text("xpPoints"), game.xp)}
+          ${renderProfileRow(text("coins"), game.coins)}
+          ${renderProfileRow(text("levelName"), game.level)}
         </div>
-      </article>
+      </details>
 
-      <article class="card profile-section">
+      <details class="card calm-details calm-details--card">
+        <summary>Show focus stats ⏱️</summary>
         <div class="section-title">
           <h3>${escapeHtml(text("focusCenterTitle"))}</h3>
           <span class="pill">${escapeHtml(focus.status)}</span>
@@ -2768,24 +3303,24 @@ function renderCalmProfile(game, focus) {
           ${renderProfileRow(text("focusSessionsTotal"), focus.sessionsTotal)}
         </div>
         <button class="btn-secondary" data-nav="focus">${escapeHtml(text("focusModeButton"))}</button>
-      </article>
+      </details>
 
       <details class="card calm-details calm-details--card">
-        <summary>${escapeHtml(text("achievementsTitle"))} <span class="pill">${unlockedCount}/${ACHIEVEMENTS.length}</span></summary>
+        <summary>Show achievements 🏆</summary>
         ${renderTierCard(game)}
-        <div class="profile-list">
-          ${renderProfileRow(text("xpPoints"), game.xp)}
-          ${renderProfileRow(text("coins"), game.coins)}
-          ${renderProfileRow(text("studyStreak"), game.streak)}
-          ${renderProfileRow(text("levelName"), game.level)}
-        </div>
+        <div class="profile-list">${renderProfileRow(text("studyStreak"), game.streak)}</div>
+        ${
+          unlockedCount
+            ? ""
+            : `<div class="empty-state"><h3>🏆 No achievements yet</h3><p class="subtitle">Complete your first task to unlock First Spark.</p></div>`
+        }
         <div class="stack" style="margin-top:10px;">
           ${ACHIEVEMENTS.map((item) => `<div class="achievement-card ${unlocked.has(item.key) ? "achievement-card--on" : ""}"><strong>${escapeHtml(item.title)}</strong><span class="microcopy">${escapeHtml(unlocked.has(item.key) ? text("unlocked") : text("locked"))}</span></div>`).join("")}
         </div>
       </details>
 
       <details class="card calm-details calm-details--card">
-        <summary>${escapeHtml(text("friendsSection"))}</summary>
+        <summary>Show friends 👥</summary>
         <p class="microcopy">${escapeHtml(text("friendsPrototypeNote"))}</p>
         <form class="field-grid" data-form="add-friend" style="margin-top:12px;">
           <div class="field">
@@ -2826,13 +3361,13 @@ function renderCalmProfile(game, focus) {
                     `;
                   })
                   .join("")
-              : `<div class="empty-state"><p class="subtitle">${escapeHtml(text("noFriendsYet"))}</p></div>`
+              : `<div class="empty-state"><h3>👥 No friends yet</h3><p class="subtitle">Add a study buddy when you’re ready.</p></div>`
           }
         </div>
       </details>
 
       <details class="card calm-details calm-details--card">
-        <summary>${escapeHtml(text("settingsSection", "Settings ⚙️"))}</summary>
+        <summary>Show settings ⚙️</summary>
         <div class="avatar-actions">
           <input id="profileAvatarInput" class="sr-only" type="file" accept="image/png,image/jpeg,image/webp" data-avatar-upload />
           <label class="btn-secondary avatar-upload-button" for="profileAvatarInput" tabindex="0">${escapeHtml(text("changeProfilePicture"))}</label>
@@ -2874,15 +3409,8 @@ function renderScreen() {
     return renderResetPasswordScreen();
   }
 
-  if (appState.route === "verify-email" && appState.user) {
-    return renderVerifyEmailScreen();
-  }
-
   if (!appState.user) {
     return appState.route === "register" ? renderAuthScreen("register") : renderAuthScreen("login");
-  }
-  if (appState.user.emailVerified === false) {
-    return renderVerifyEmailScreen();
   }
   if (!isOnboarded(appState.user) || appState.route === "onboarding") {
     return renderOnboarding();
@@ -2985,6 +3513,55 @@ function bindEvents() {
   document.querySelectorAll("[data-action='make-plan-better']").forEach((button) => {
     button.addEventListener("click", improvePlan);
   });
+  document.querySelectorAll("[data-action='demo-school-routine']").forEach((button) => {
+    button.addEventListener("click", addDemoSchoolRoutine);
+  });
+  document.querySelectorAll("[data-action='demo-smart-week']").forEach((button) => {
+    button.addEventListener("click", generateSmartWeekDemo);
+  });
+  document.querySelectorAll("[data-action='apply-ai-schedule']").forEach((button) => {
+    button.addEventListener("click", applyAiSchedulePreview);
+  });
+  document.querySelectorAll("[data-action='edit-ai-schedule']").forEach((button) => {
+    button.addEventListener("click", () => {
+      setFlash("Let’s fine-tune it together in the calendar view.", "info");
+      setRoute("calendar");
+    });
+  });
+  document.querySelectorAll("[data-action='dismiss-ai-schedule']").forEach((button) => {
+    button.addEventListener("click", () => {
+      appState.aiSchedulePreview = null;
+      setFlash("Okay. We can try another schedule when you’re ready.", "info");
+      renderApp();
+    });
+  });
+  document.querySelectorAll("[data-action='edit-routine']").forEach((button) => {
+    button.addEventListener("click", () => {
+      const routineId = button.getAttribute("data-routine-id");
+      const routine = (appState.recurringBlocks || []).find((item) => item.id === routineId);
+      if (!routine) return;
+      appState.editingRoutineId = routineId;
+      appState.currentRoutineDraft = { ...routine, daysOfWeek: routine.repeatWeekdays || [] };
+      renderApp();
+    });
+  });
+  document.querySelectorAll("[data-action='delete-routine']").forEach((button) => {
+    button.addEventListener("click", () => {
+      const routineId = button.getAttribute("data-routine-id");
+      if (!window.confirm("Delete this routine?")) return;
+      appState.recurringBlocks = (appState.recurringBlocks || []).filter((item) => item.id !== routineId);
+      saveRecurringBlocks();
+      setFlash("Routine removed from your calendar.", "success");
+      renderApp();
+    });
+  });
+  document.querySelectorAll("[data-action='cancel-routine-edit']").forEach((button) => {
+    button.addEventListener("click", () => {
+      appState.editingRoutineId = null;
+      appState.currentRoutineDraft = null;
+      renderApp();
+    });
+  });
 
   document.querySelectorAll("[data-action='clear-chat']").forEach((button) => {
     button.addEventListener("click", () => {
@@ -2998,6 +3575,15 @@ function bindEvents() {
       appState.selectedCalendarDate = button.getAttribute("data-calendar-date");
       renderApp();
     });
+  });
+  document.querySelectorAll("[data-calendar-hour]").forEach((button) => {
+    button.addEventListener("click", () => {
+      appState.selectedCalendarHour = Number(button.getAttribute("data-calendar-hour") || 18);
+      renderApp();
+    });
+  });
+  document.querySelectorAll("[data-event-id]").forEach((button) => {
+    button.addEventListener("click", () => handleCalendarEventClick(button));
   });
 
   document.querySelectorAll("[data-action='reset-progress']").forEach((button) => {
@@ -3072,10 +3658,12 @@ function setFocusPreset(presetKey) {
 
 function startFocusTimer() {
   if (appState.focusRunning || appState.focusIntervalId) return;
+  stopFocusTimer();
   if (appState.focusMode === "focus" && !appState.activeFocusSessionKey) {
     appState.activeFocusSessionKey = `focus:${todayKey()}:${appState.focusPresetKey}:${Date.now()}`;
   }
   appState.focusRunning = true;
+  renderApp();
   appState.focusIntervalId = window.setInterval(() => {
     appState.focusSeconds = Math.max(0, appState.focusSeconds - 1);
     if (appState.focusSeconds === 0) {
@@ -3100,12 +3688,11 @@ function startFocusTimer() {
       updateFocusTimerUi();
     }
   }, 1000);
-  updateFocusTimerUi();
 }
 
 function pauseFocusTimer() {
   stopFocusTimer();
-  updateFocusTimerUi();
+  renderApp();
 }
 
 function stopFocusTimer() {
@@ -3146,6 +3733,146 @@ function updateFocusTimerUi() {
   });
 }
 
+async function applyAiSchedulePreview() {
+  const events = appState.aiSchedulePreview?.events || [];
+  if (!events.length) {
+    setFlash("No schedule to add yet. Ask AI to organize your week first.", "warning");
+    renderApp();
+    return;
+  }
+  try {
+    for (const event of events) {
+      await apiRequest("/api/calendar-blocks", {
+        method: "POST",
+        body: {
+          title: event.title,
+          date: event.date,
+          startTime: event.startTime,
+          endTime: event.endTime,
+          category: event.category,
+          notes: `${event.notes || ""} [source: ai]`.trim(),
+        },
+      });
+    }
+    appState.aiSchedulePreview = null;
+    await refreshBootstrap();
+    setFlash("Your week is organized.", "success");
+    setRoute("calendar");
+  } catch (error) {
+    flashRequestError(error);
+    renderApp();
+  }
+}
+
+function addDemoSchoolRoutine() {
+  const today = new Date();
+  const anchor = toDateInputValue(today);
+  const demoRoutine = {
+    id: `routine_demo_${Date.now()}`,
+    title: "School",
+    category: "School",
+    date: anchor,
+    startTime: "08:00",
+    endTime: "17:00",
+    notes: "Demo weekly routine",
+    repeat: "weekdays",
+    repeatWeekdays: [0, 1, 4],
+    repeatEndDate: "",
+    source: "recurring",
+    repeatRule: { type: "weekly", daysOfWeek: [0, 1, 4] },
+  };
+  appState.recurringBlocks.push(demoRoutine);
+  saveRecurringBlocks();
+  setFlash("School routine added. Let’s find your best study windows.", "success");
+  renderApp();
+}
+
+function detectDailyHourRequest(textValue) {
+  const message = String(textValue || "").toLowerCase();
+  const match = message.match(/(\d+(?:\.\d+)?)\s*hour/);
+  if (!match) return null;
+  return Math.max(0.5, Math.min(6, Number(match[1])));
+}
+
+function detectRestDaysFromText(textValue) {
+  const value = String(textValue || "").toLowerCase();
+  const mapping = [
+    { key: "sunday", id: 0 },
+    { key: "monday", id: 1 },
+    { key: "tuesday", id: 2 },
+    { key: "wednesday", id: 3 },
+    { key: "thursday", id: 4 },
+    { key: "friday", id: 5 },
+    { key: "saturday", id: 6 },
+  ];
+  return mapping.filter((entry) => value.includes(entry.key)).map((entry) => entry.id);
+}
+
+function buildAiSchedulePreview(message = "") {
+  const dailyRequestedHours = detectDailyHourRequest(message);
+  const events = generateSmartStudySchedule({
+    subjects: appState.subjects,
+    assignments: appState.assignments,
+    tasks: appState.tasks,
+    calendarBlocks: appState.calendarBlocks,
+    recurringBlocks: appState.recurringBlocks,
+    dailyAvailableHours: appState.user?.dailyAvailableHours || 1,
+    requestedHoursPerDay: dailyRequestedHours,
+    preferredRestDays: appState.preferredRestDays || [],
+  });
+  return {
+    sourceMessage: message,
+    generatedAt: new Date().toISOString(),
+    events,
+  };
+}
+
+function generateSmartWeekDemo() {
+  const preview = buildAiSchedulePreview("organize my week");
+  if (!preview.events.length) {
+    setFlash("Your day looks full. I found no safe study window. Try light review or move a block.", "warning");
+    renderApp();
+    return;
+  }
+  appState.aiSchedulePreview = preview;
+  setFlash("I found these study times for you. Review and add when ready.", "info");
+  setRoute("calendar");
+}
+
+function getWeekdayName(dayIndex) {
+  return ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][Number(dayIndex)] || "";
+}
+
+function handleCalendarEventClick(button) {
+  const eventId = button.getAttribute("data-event-id");
+  const source = button.getAttribute("data-event-source");
+  const category = String(button.getAttribute("data-event-category") || "").toLowerCase();
+  if (!eventId || source === "ai") return;
+
+  if (category.includes("assignment")) {
+    const item = (appState.assignments || []).find((entry) => entry.id === eventId);
+    if (!item) return;
+    if (window.confirm(`Delete assignment "${item.title}"?`)) {
+      appState.assignments = appState.assignments.filter((entry) => entry.id !== eventId);
+      saveAssignments();
+      setFlash("Assignment removed from calendar.", "success");
+      renderApp();
+    }
+    return;
+  }
+
+  const block = (appState.calendarBlocks || []).find((entry) => entry.id === eventId);
+  if (!block) return;
+  if (window.confirm(`Delete "${block.title}" from calendar?`)) {
+    apiRequest(`/api/calendar-blocks/${eventId}`, { method: "DELETE", body: {} })
+      .then(async () => {
+        await refreshBootstrap();
+        setFlash("Event removed from calendar.", "success");
+      })
+      .catch((error) => flashRequestError(error));
+  }
+}
+
 async function handleFormSubmit(event) {
   event.preventDefault();
   const form = event.currentTarget;
@@ -3161,13 +3888,8 @@ async function handleFormSubmit(event) {
       }
       const payload = await apiRequest("/api/auth/register", { method: "POST", body: data });
       applySession(payload);
-      if (payload.requiresVerification) {
-        setFlash(payload.message || "We sent a verification code to your email.");
-      } else {
-        appState.route = "onboarding";
-        await refreshBootstrap();
-        setFlash(text("accountCreated"));
-      }
+      await refreshBootstrap();
+      setFlash(text("accountCreated"));
       renderApp();
       return;
     }
@@ -3175,12 +3897,8 @@ async function handleFormSubmit(event) {
     if (formType === "login") {
       const payload = await apiRequest("/api/auth/login", { method: "POST", body: data });
       applySession(payload);
-      if (payload.requiresVerification) {
-        setFlash(payload.message || "Please verify your email first.", "warning");
-      } else {
-        await refreshBootstrap();
-        setFlash(text("loggedInSuccess"));
-      }
+      await refreshBootstrap();
+      setFlash(text("loggedInSuccess"));
       renderApp();
       return;
     }
@@ -3243,6 +3961,7 @@ async function handleFormSubmit(event) {
         ...data,
         date: data.date || appState.selectedCalendarDate,
         category: data.category || text("busyBlock"),
+        source: "manual",
       };
       await apiRequest("/api/calendar-blocks", {
         method: "POST",
@@ -3267,6 +3986,70 @@ async function handleFormSubmit(event) {
       await refreshBootstrap();
       appState.selectedCalendarDate = data.date || appState.selectedCalendarDate;
       setFlash(text("savedPreferences"));
+      renderApp();
+      return;
+    }
+
+    if (formType === "weekly-routine") {
+      const days = formData.getAll("daysOfWeek").map((value) => Number(value));
+      if (!days.length) {
+        setFlash("Choose at least one day to save this routine.", "warning");
+        renderApp();
+        return;
+      }
+      const anchor = toDateInputValue(new Date());
+      const routinePayload = {
+        id: appState.editingRoutineId || `routine_${Date.now()}`,
+        title: String(data.title || "").trim() || "Routine",
+        category: String(data.category || "Busy").trim(),
+        date: anchor,
+        startTime: String(data.startTime || "").trim(),
+        endTime: String(data.endTime || "").trim(),
+        notes: String(data.notes || "").trim(),
+        repeat: "weekly",
+        repeatWeekdays: days,
+        daysOfWeek: days,
+        repeatEndDate: "",
+        source: "recurring",
+        repeatRule: { type: "weekly", daysOfWeek: days },
+      };
+      if (appState.editingRoutineId) {
+        appState.recurringBlocks = (appState.recurringBlocks || []).map((item) => (item.id === appState.editingRoutineId ? routinePayload : item));
+      } else {
+        appState.recurringBlocks.push(routinePayload);
+      }
+      saveRecurringBlocks();
+      appState.editingRoutineId = null;
+      appState.currentRoutineDraft = null;
+      setFlash("Weekly routine saved. It now appears across your calendar.", "success");
+      renderApp();
+      return;
+    }
+
+    if (formType === "rest-days") {
+      appState.preferredRestDays = formData.getAll("restDays").map((value) => Number(value));
+      saveRestDays();
+      setFlash("Rest days saved. I will keep those days lighter.", "success");
+      renderApp();
+      return;
+    }
+
+    if (formType === "assignment") {
+      const assignment = {
+        id: `assignment_${Date.now()}`,
+        title: String(data.title || "").trim(),
+        subject: String(data.subject || "").trim(),
+        dueDate: String(data.dueDate || "").trim(),
+        estimatedHours: Number(data.estimatedHours || 1),
+        priority: String(data.priority || "Medium"),
+        difficulty: String(data.difficulty || "Medium"),
+        notes: String(data.notes || "").trim(),
+        status: String(data.status || "not started"),
+      };
+      appState.assignments.push(assignment);
+      saveAssignments();
+      appState.selectedCalendarDate = assignment.dueDate || appState.selectedCalendarDate;
+      setFlash("Assignment added. Want me to schedule work sessions before the due date?", "info");
       renderApp();
       return;
     }
@@ -3303,7 +4086,7 @@ async function handleFormSubmit(event) {
       return;
     }
   } catch (error) {
-    setFlash(error.message, "warning");
+    flashRequestError(error);
   }
 }
 
@@ -3313,11 +4096,14 @@ async function deleteSubject(subjectId) {
     await refreshBootstrap();
     setFlash(text("subjectDeleted"));
   } catch (error) {
-    setFlash(error.message, "warning");
+    flashRequestError(error);
   }
 }
 
 async function generatePlan() {
+  appState.planGenerating = true;
+  setFlash("Building your study plan…", "info");
+  renderApp();
   try {
     let response;
     if (appState.config.apiReady) {
@@ -3345,11 +4131,19 @@ async function generatePlan() {
         ? text("openAiPlanReady")
         : response.source === "puter"
           ? text("puterPlanReady")
-          : text("planReady", "Your plan is ready — calm, clear, and realistic ✨");
+          : "Your plan is ready ✅";
+    appState.planGenerating = false;
     setFlash(successMessage, response.warning ? "warning" : "success");
+    if (window.confirm("Your plan is ready ✅\n\nWould you like StudySpark to propose calendar time slots for this plan now?")) {
+      appState.aiSchedulePreview = buildAiSchedulePreview("make me a study schedule");
+      setRoute("calendar");
+      return;
+    }
     setRoute("my-plan");
   } catch (error) {
-    setFlash(error.message, "warning");
+    console.error("Generate Plan failed:", error);
+    appState.planGenerating = false;
+    flashRequestError(error);
   }
 }
 
@@ -3367,7 +4161,7 @@ async function toggleTask(taskId, status) {
     }
     await refreshBootstrap();
   } catch (error) {
-    setFlash(error.message, "warning");
+    flashRequestError(error);
   }
 }
 
@@ -3381,11 +4175,62 @@ async function resetLocalProgress() {
     await refreshBootstrap();
     setFlash(text("resetProgressDone"));
   } catch (error) {
-    setFlash(error.message, "warning");
+    flashRequestError(error);
   }
 }
 
 async function sendCoachMessage(message) {
+  const messageText = String(message || "");
+  const scheduleIntent = /(schedule|calendar|organize my week|one hour daily|study time|put study time|assignment|project|due|lighter|off)/i.test(messageText);
+  const assignmentIntent = /(assignment|project|due)/i.test(messageText);
+  const restDays = detectRestDaysFromText(messageText);
+  if (scheduleIntent) {
+    if (restDays.length) {
+      appState.preferredRestDays = [...new Set([...(appState.preferredRestDays || []), ...restDays])];
+      saveRestDays();
+    }
+    if (assignmentIntent) {
+      const inferredTitle = messageText.length > 80 ? "Assignment task" : messageText;
+      const fallbackDue = toDateInputValue(new Date(Date.now() + 4 * 24 * 60 * 60 * 1000));
+      appState.assignments.push({
+        id: `assignment_ai_${Date.now()}`,
+        title: inferredTitle,
+        subject: appState.subjects[0]?.subjectName || "General",
+        dueDate: fallbackDue,
+        estimatedHours: 3,
+        priority: "High",
+        difficulty: "Medium",
+        notes: "Created from AI chat intent.",
+        status: "not started",
+      });
+      saveAssignments();
+    }
+    const preview = buildAiSchedulePreview(message);
+    if (!preview.events.length) {
+      setFlash("Your day looks full. I found no safe study window. Try light review or move a block.", "warning");
+      return;
+    }
+    appState.aiSchedulePreview = preview;
+    appState.chatHistory = [
+      ...appState.chatHistory,
+      {
+        id: `chat_user_${Date.now()}`,
+        role: "user",
+        message,
+        createdDate: new Date().toISOString(),
+      },
+      {
+        id: `chat_ai_${Date.now() + 1}`,
+        role: "assistant",
+        message: `Let’s find your best study windows.\nI avoided your school hours and added rest so the plan stays realistic.\n${restDays.length ? "I kept your requested rest days lighter.\n" : ""}I found these study times for you. Add this to your calendar?`,
+        createdDate: new Date().toISOString(),
+      },
+    ];
+    setFlash("I found these study times for you. Review and add when ready.", "info");
+    setRoute("calendar");
+    return;
+  }
+
   appState.aiPending = true;
   appState.chatHistory = [
     ...appState.chatHistory,
@@ -3431,7 +4276,7 @@ async function sendCoachMessage(message) {
   } catch (error) {
     appState.aiPending = false;
     appState.chatHistory = appState.chatHistory.filter((entry) => !entry.pending);
-    setFlash(error.message, "warning");
+    flashRequestError(error);
   }
 }
 
@@ -3456,7 +4301,7 @@ async function sendMiniChatMessage(message) {
     renderApp();
   } catch (error) {
     appState.aiPending = false;
-    setFlash(error.message, "warning");
+    flashRequestError(error);
     renderApp();
   }
 }
@@ -3512,7 +4357,7 @@ async function improvePlan() {
     setRoute("my-plan");
   } catch (error) {
     appState.aiPending = false;
-    setFlash(error.message, "warning");
+    flashRequestError(error);
     renderApp();
   }
 }
@@ -3581,7 +4426,7 @@ async function resolveFocusCompletion(completed) {
     await refreshBootstrap();
     setFlash(`${text("rewardCelebration")} +${prompt.xp} XP / +${prompt.coins} ${text("coins")}`);
   } catch (error) {
-    setFlash(error.message, "warning");
+    flashRequestError(error);
   }
   renderApp();
 }
@@ -3627,7 +4472,7 @@ async function resendVerificationCode() {
     appState.devVerificationCode = payload.devVerificationCode || "";
     setFlash(payload.message || "A new verification code was sent.");
   } catch (error) {
-    setFlash(error.message, "warning");
+    flashRequestError(error);
   }
   renderApp();
 }

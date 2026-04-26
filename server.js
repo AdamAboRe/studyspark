@@ -33,6 +33,7 @@ const ASSET_EXTENSIONS = new Map([
 const PORT = Number(process.env.PORT || 3000);
 const MAX_REQUEST_BODY_BYTES = Number(process.env.MAX_REQUEST_BODY_BYTES || 1_000_000);
 const APP_BASE_URL = process.env.APP_BASE_URL || `http://localhost:${PORT}`;
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
 const ALLOWED_ORIGINS = new Set(
   String(process.env.ALLOWED_ORIGINS || "http://localhost:3000")
     .split(",")
@@ -146,63 +147,69 @@ async function handleApi(req, res, requestUrl) {
   }
 
   if (req.method === "POST" && pathname === "/api/auth/register") {
-    const payload = await readJsonBody(req);
-    const state = readState();
-    const email = requireEmail(payload, "email");
-    const password = requirePassword(payload, "password");
-    const fullName = requireString(payload, "fullName", { min: 2, max: 80 });
+    try {
+      const payload = await readJsonBody(req);
+      const state = readState();
+      const email = requireEmail(payload, "email");
+      const password = requirePassword(payload, "password");
+      const fullName = requireString(payload, "fullName", { min: 2, max: 80 });
 
-    if (!fullName || !isValidEmail(email) || !password) {
-      sendJson(res, 400, { error: "validation_error", message: "Missing required registration fields." });
-      return;
-    }
+      if (!fullName || !isValidEmail(email) || !password) {
+        sendJson(res, 400, { error: "validation_error", message: "Missing required registration fields." });
+        return;
+      }
 
-    if (!isStrongPassword(password)) {
-      sendJson(res, 400, {
-        error: "weak_password",
-        message: "Password must be at least 8 characters and include at least one letter and one number.",
+      if (!isStrongPassword(password)) {
+        sendJson(res, 400, {
+          error: "weak_password",
+          message: "Password must be at least 8 characters and include at least one letter and one number.",
+        });
+        return;
+      }
+
+      const existingUser = state.users.find((user) => normalizeEmail(user.email) === email);
+      if (existingUser) {
+        sendJson(res, 409, { error: "email_exists", message: "Email already exists." });
+        return;
+      }
+
+      const user = {
+        id: uid("user"),
+        fullName,
+        email,
+        passwordHash: hashPassword(password),
+        provider: "email",
+        googleId: "",
+        avatarUrl: "",
+        academicLevel: "",
+        preferredLanguage: "",
+        studyGoal: "",
+        dailyAvailableHours: "",
+        emailVerified: false,
+        createdDate: new Date().toISOString(),
+      };
+
+      const session = createSession(state, user.id);
+      state.users.push(user);
+      writeState(state);
+      // TODO: Re-enable email verification for production.
+      const verificationDelivery = { delivered: false, mode: "disabled", devCode: "" };
+
+      // TODO: Re-enable email verification for production.
+      sendJson(res, 201, {
+        token: session.token,
+        user: sanitizeUser(user),
+        requiresVerification: false,
+        message: "Account created successfully.",
+        emailDelivery: verificationDelivery.mode,
+        ...(canExposeDevCodes(verificationDelivery) ? { devVerificationCode: verificationDelivery.devCode } : {}),
       });
       return;
-    }
-
-    const existingUser = state.users.find((user) => user.email === email);
-    if (existingUser) {
-      sendJson(res, 409, { error: "email_exists", message: "An account with this email already exists." });
+    } catch (error) {
+      console.error("Register failed:", error);
+      sendJson(res, 500, { error: "registration_failed", message: "Registration failed." });
       return;
     }
-
-    const user = {
-      id: uid("user"),
-      fullName,
-      email,
-      passwordHash: hashPassword(password),
-      provider: "email",
-      googleId: "",
-      avatarUrl: "",
-      academicLevel: "",
-      preferredLanguage: "",
-      studyGoal: "",
-      dailyAvailableHours: "",
-      emailVerified: false,
-      createdDate: new Date().toISOString(),
-    };
-
-    const session = createSession(state, user.id);
-    state.users.push(user);
-    writeState(state);
-    const verificationDelivery = await sendVerificationCode(user);
-
-    sendJson(res, 201, {
-      token: session.token,
-      user: sanitizeUser(user),
-      requiresVerification: true,
-      message: verificationDelivery.delivered
-        ? "We sent a verification code to your email."
-        : "Local mode: use the verification code shown on this screen.",
-      emailDelivery: verificationDelivery.mode,
-      ...(canExposeDevCodes(verificationDelivery) ? { devVerificationCode: verificationDelivery.devCode } : {}),
-    });
-    return;
   }
 
   if (req.method === "POST" && pathname === "/api/auth/login") {
@@ -210,32 +217,42 @@ async function handleApi(req, res, requestUrl) {
     const state = readState();
     const email = requireEmail(payload, "email");
     const password = requirePassword(payload, "password");
-    const user = state.users.find((entry) => entry.email === email);
+    const user = state.users.find((entry) => normalizeEmail(entry.email) === email);
+    const passwordMatches = user ? verifyPassword(password, user.passwordHash) : false;
+    if (!IS_PRODUCTION) {
+      console.log("Login attempt:", email);
+      console.log("User found:", Boolean(user));
+      console.log("Password match:", Boolean(passwordMatches));
+    }
 
-    if (!user || !verifyPassword(password, user.passwordHash)) {
+    if (!user || !passwordMatches) {
       sendJson(res, 401, { error: "invalid_credentials", message: "Invalid email or password." });
       return;
     }
 
     const session = createSession(state, user.id);
     writeState(state);
-    let verificationDelivery = null;
-    if (!user.emailVerified) {
-      verificationDelivery = await sendVerificationCode(user);
-    }
+    // TODO: Re-enable email verification for production.
+    const verificationDelivery = null;
 
+    // TODO: Re-enable email verification for production.
     sendJson(res, 200, {
       token: session.token,
       user: sanitizeUser(user),
-      requiresVerification: !user.emailVerified,
-      message: user.emailVerified
-        ? "Welcome back."
-        : verificationDelivery?.delivered
-          ? "Please verify your email to continue."
-          : "Local mode: use the verification code shown on this screen.",
+      requiresVerification: false,
+      message: "Welcome back.",
       emailDelivery: verificationDelivery?.mode || null,
       ...(canExposeDevCodes(verificationDelivery) ? { devVerificationCode: verificationDelivery.devCode } : {}),
     });
+    return;
+  }
+
+  if (!IS_PRODUCTION && req.method === "POST" && pathname === "/api/dev/reset-users") {
+    const state = readState();
+    state.users = [];
+    state.sessions = [];
+    writeState(state);
+    sendJson(res, 200, { ok: true, message: "Development users and sessions were cleared." });
     return;
   }
 
@@ -1191,6 +1208,10 @@ function enforceRateLimit(req, res, bucketName, maxRequests, windowMs) {
 }
 
 function requiresVerifiedEmail(pathname) {
+  // TODO: Re-enable email verification for production.
+  return false;
+
+  /*
   const publicPaths = new Set([
     "/api/health",
     "/api/config",
@@ -1204,6 +1225,7 @@ function requiresVerifiedEmail(pathname) {
   ]);
 
   return pathname.startsWith("/api/") && !publicPaths.has(pathname);
+  */
 }
 
 function uid(prefix) {
@@ -1420,6 +1442,14 @@ async function sendPasswordResetCode(user) {
 }
 
 async function sendEmail({ to, subject, text, devCode }) {
+  if (process.env.RESEND_API_KEY) {
+    const result = await sendEmailWithResend({ to, subject, text });
+    if (result.delivered) {
+      return result;
+    }
+    console.warn(`Resend email failed, falling back to SMTP/dev log: ${result.error}`);
+  }
+
   if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
     console.log(`[DEV EMAIL] ${subject} to ${to}: ${devCode}`);
     return { delivered: false, mode: "dev-log", devCode };
@@ -1452,6 +1482,33 @@ async function sendEmail({ to, subject, text, devCode }) {
   });
 
   return { delivered: true, mode: "smtp" };
+}
+
+async function sendEmailWithResend({ to, subject, text }) {
+  try {
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: process.env.RESEND_FROM || process.env.SMTP_FROM || "StudySpark <onboarding@resend.dev>",
+        to,
+        subject,
+        text,
+      }),
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      return { delivered: false, mode: "resend", error: data?.message || data?.error || "Resend request failed." };
+    }
+
+    return { delivered: true, mode: "resend", id: data.id || "" };
+  } catch (error) {
+    return { delivered: false, mode: "resend", error: error.message };
+  }
 }
 
 function canExposeDevCodes(delivery) {
@@ -1958,8 +2015,8 @@ function loadEnvFile(filePath) {
 }
 
 function validateEnvironment() {
-  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    console.warn("SMTP is not fully configured. Verification/reset emails will be logged in the server console for local development.");
+  if (!process.env.RESEND_API_KEY && (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS)) {
+    console.warn("No Resend or SMTP email provider is configured. Verification/reset emails will be logged in the server console for local development.");
   }
 
   if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.includes(" ")) {
