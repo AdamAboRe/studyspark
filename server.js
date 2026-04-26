@@ -37,13 +37,21 @@ const MAX_REQUEST_BODY_BYTES = Number(process.env.MAX_REQUEST_BODY_BYTES || 1_00
 const APP_BASE_URL = process.env.APP_BASE_URL || `http://localhost:${PORT}`;
 const IS_PRODUCTION = process.env.NODE_ENV === "production";
 const CLIENT_URL = String(process.env.CLIENT_URL || "").trim();
-const ORIGIN_SOURCE = String(process.env.ALLOWED_ORIGINS || CLIENT_URL || "http://localhost:3000");
-const ALLOW_ALL_ORIGINS = ORIGIN_SOURCE === "*";
+const ENV_ALLOWED_ORIGINS = String(process.env.ALLOWED_ORIGINS || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+const ALLOW_ALL_ORIGINS = ENV_ALLOWED_ORIGINS.includes("*");
 const ALLOWED_ORIGINS = new Set(
-  ORIGIN_SOURCE
-    .split(",")
-    .map((origin) => origin.trim())
+  [
+    CLIENT_URL,
+    "https://studyspark-l26x.onrender.com",
+    "http://localhost:3000",
+    "http://localhost:5173",
+    ...ENV_ALLOWED_ORIGINS,
+  ]
     .filter(Boolean)
+    .map((origin) => origin.trim())
 );
 validateEnvironment();
 
@@ -1115,7 +1123,11 @@ function securityHeaders(req) {
 function isOriginAllowed(req) {
   const origin = normalizeOrigin(req?.headers?.origin);
   if (!origin) return true;
-  return ALLOW_ALL_ORIGINS || ALLOWED_ORIGINS.has(origin);
+  const allowed = ALLOW_ALL_ORIGINS || ALLOWED_ORIGINS.has(origin);
+  if (!allowed) {
+    console.warn("Blocked CORS origin:", origin, "for", req?.method || "UNKNOWN", req?.url || "/");
+  }
+  return allowed;
 }
 
 function normalizeOrigin(origin) {
