@@ -11,7 +11,7 @@ const TELEMETRY_STORAGE_KEY = "studyspark-telemetry-log";
 const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:3000"
-    : (window.__APP_CONFIG__ && window.__APP_CONFIG__.VITE_API_BASE) || "";
+    : "https://studyspark-l26x.onrender.com";
 const BRAND_NAME = "StudySpark ✨";
 const BRAND_TAGLINE = "Your calm AI study assistant";
 const LOGO_SRC = "assets/studyspark-logo.png";
