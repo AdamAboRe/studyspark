@@ -2956,18 +2956,13 @@ function renderCalmCalendar({ monthDays, selectedEvents, selectedStudyHours, fre
             : ""
         }
       </article>
-      ${
-        recurringSummary.length
-          ? `<details class="card calm-details calm-details--card"><summary>${escapeHtml(text("recurringBlocksTitle", "Recurring blocks"))}</summary>${recurringSummary.map((item) => `<p class="subtitle">${escapeHtml(item)}</p>`).join("")}</details>`
-          : ""
-      }
       ${renderAiSchedulePreviewCard()}
       <details class="card calm-details calm-details--card" open>
         <summary>Day view</summary>
         ${renderDayTimeline(dayTimelineEvents)}
       </details>
-      <details class="card calm-details calm-details--card">
-        <summary>Weekly Routine</summary>
+      <details class="card calm-details calm-details--card" open>
+        <summary>Weekly routine</summary>
         <form class="field-grid" data-form="weekly-routine" style="margin-top:14px;">
           <div class="field">
             <label for="routineTitle">Routine title</label>
@@ -3022,70 +3017,77 @@ function renderCalmCalendar({ monthDays, selectedEvents, selectedStudyHours, fre
         </div>
       </details>
       <details class="card calm-details calm-details--card">
-        <summary>Preferred rest days</summary>
-        <form class="field-grid" data-form="rest-days" style="margin-top:14px;">
-          <div class="quick-actions">
-            ${["0", "1", "2", "3", "4", "5", "6"].map((day) => `<label class="quick-chip"><input type="checkbox" name="restDays" value="${day}" ${(appState.preferredRestDays || []).includes(Number(day)) ? "checked" : ""} />${escapeHtml(getWeekdayName(day).slice(0, 3))}</label>`).join("")}
-          </div>
-          <button class="btn" type="submit">Save and continue</button>
-        </form>
-      </details>
-      <details class="card calm-details calm-details--card">
-        <summary>Add Assignment 📌</summary>
-        <form class="field-grid" data-form="assignment" style="margin-top:14px;">
-          <div class="field">
-            <label for="assignmentTitle">Title</label>
-            <input id="assignmentTitle" name="title" required />
-          </div>
-          <div class="field">
-            <label for="assignmentSubject">Subject</label>
-            <input id="assignmentSubject" name="subject" required />
-          </div>
-          <div class="field">
-            <label for="assignmentDueDate">Due date</label>
-            <input id="assignmentDueDate" name="dueDate" type="date" required />
-          </div>
-          <div class="surface-actions surface-actions--two">
+        <summary>More tools</summary>
+        ${
+          recurringSummary.length
+            ? `<details class="calm-details"><summary>${escapeHtml(text("recurringBlocksTitle", "Recurring blocks"))}</summary>${recurringSummary.map((item) => `<p class="subtitle">${escapeHtml(item)}</p>`).join("")}</details>`
+            : ""
+        }
+        <details class="calm-details">
+          <summary>Preferred rest days</summary>
+          <form class="field-grid" data-form="rest-days" style="margin-top:14px;">
+            <div class="quick-actions">
+              ${["0", "1", "2", "3", "4", "5", "6"].map((day) => `<label class="quick-chip"><input type="checkbox" name="restDays" value="${day}" ${(appState.preferredRestDays || []).includes(Number(day)) ? "checked" : ""} />${escapeHtml(getWeekdayName(day).slice(0, 3))}</label>`).join("")}
+            </div>
+            <button class="btn" type="submit">Save and continue</button>
+          </form>
+        </details>
+        <details class="calm-details">
+          <summary>Add assignment</summary>
+          <form class="field-grid" data-form="assignment" style="margin-top:14px;">
             <div class="field">
-              <label for="assignmentHours">Estimated hours</label>
-              <input id="assignmentHours" name="estimatedHours" type="number" min="0.5" max="20" step="0.5" required />
+              <label for="assignmentTitle">Title</label>
+              <input id="assignmentTitle" name="title" required />
             </div>
             <div class="field">
-              <label for="assignmentStatus">Status</label>
-              <select id="assignmentStatus" name="status">
-                <option value="not started">Not started</option>
-                <option value="in progress">In progress</option>
-                <option value="done">Done</option>
-              </select>
-            </div>
-          </div>
-          <div class="surface-actions surface-actions--two">
-            <div class="field">
-              <label for="assignmentPriority">Priority</label>
-              <select id="assignmentPriority" name="priority">
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-              </select>
+              <label for="assignmentSubject">Subject</label>
+              <input id="assignmentSubject" name="subject" required />
             </div>
             <div class="field">
-              <label for="assignmentDifficulty">Difficulty</label>
-              <select id="assignmentDifficulty" name="difficulty">
-                <option value="Easy">Easy</option>
-                <option value="Medium">Medium</option>
-                <option value="Hard">Hard</option>
-              </select>
+              <label for="assignmentDueDate">Due date</label>
+              <input id="assignmentDueDate" name="dueDate" type="date" required />
             </div>
-          </div>
-          <div class="field">
-            <label for="assignmentNotes">Notes</label>
-            <textarea id="assignmentNotes" name="notes"></textarea>
-          </div>
-          <button class="btn" type="submit">Save and continue</button>
-        </form>
-      </details>
-      <details class="card calm-details calm-details--card">
-        <summary>${escapeHtml(text("addCalendarBlock"))}</summary>
+            <div class="surface-actions surface-actions--two">
+              <div class="field">
+                <label for="assignmentHours">Estimated hours</label>
+                <input id="assignmentHours" name="estimatedHours" type="number" min="0.5" max="20" step="0.5" required />
+              </div>
+              <div class="field">
+                <label for="assignmentStatus">Status</label>
+                <select id="assignmentStatus" name="status">
+                  <option value="not started">Not started</option>
+                  <option value="in progress">In progress</option>
+                  <option value="done">Done</option>
+                </select>
+              </div>
+            </div>
+            <div class="surface-actions surface-actions--two">
+              <div class="field">
+                <label for="assignmentPriority">Priority</label>
+                <select id="assignmentPriority" name="priority">
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="assignmentDifficulty">Difficulty</label>
+                <select id="assignmentDifficulty" name="difficulty">
+                  <option value="Easy">Easy</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Hard">Hard</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="assignmentNotes">Notes</label>
+              <textarea id="assignmentNotes" name="notes"></textarea>
+            </div>
+            <button class="btn" type="submit">Save and continue</button>
+          </form>
+        </details>
+        <details class="calm-details">
+          <summary>${escapeHtml(text("addCalendarBlock"))}</summary>
         <form class="field-grid" data-form="calendar-block" style="margin-top:14px;">
           <div class="field">
             <label for="blockTitle">${escapeHtml(text("blockTitle"))}</label>
@@ -3117,6 +3119,7 @@ function renderCalmCalendar({ monthDays, selectedEvents, selectedStudyHours, fre
           </div>
           <button class="btn" type="submit">${escapeHtml(text("saveBlock"))}</button>
         </form>
+        </details>
       </details>
     </section>
   `;
@@ -3292,7 +3295,7 @@ function renderCalmProfile(game, focus) {
       </details>
 
       <details class="card calm-details calm-details--card">
-        <summary>Show focus stats ⏱️</summary>
+        <summary>Focus stats</summary>
         <div class="section-title">
           <h3>${escapeHtml(text("focusCenterTitle"))}</h3>
           <span class="pill">${escapeHtml(focus.status)}</span>
@@ -3306,7 +3309,7 @@ function renderCalmProfile(game, focus) {
       </details>
 
       <details class="card calm-details calm-details--card">
-        <summary>Show achievements 🏆</summary>
+        <summary>Achievements</summary>
         ${renderTierCard(game)}
         <div class="profile-list">${renderProfileRow(text("studyStreak"), game.streak)}</div>
         ${
@@ -3320,7 +3323,7 @@ function renderCalmProfile(game, focus) {
       </details>
 
       <details class="card calm-details calm-details--card">
-        <summary>Show friends 👥</summary>
+        <summary>Friends</summary>
         <p class="microcopy">${escapeHtml(text("friendsPrototypeNote"))}</p>
         <form class="field-grid" data-form="add-friend" style="margin-top:12px;">
           <div class="field">
@@ -3367,7 +3370,7 @@ function renderCalmProfile(game, focus) {
       </details>
 
       <details class="card calm-details calm-details--card">
-        <summary>Show settings ⚙️</summary>
+        <summary>Settings</summary>
         <div class="avatar-actions">
           <input id="profileAvatarInput" class="sr-only" type="file" accept="image/png,image/jpeg,image/webp" data-avatar-upload />
           <label class="btn-secondary avatar-upload-button" for="profileAvatarInput" tabindex="0">${escapeHtml(text("changeProfilePicture"))}</label>

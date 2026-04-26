@@ -924,7 +924,7 @@ textarea:disabled {
 }
 
 .calm-details {
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .calm-details summary {
@@ -935,7 +935,9 @@ textarea:disabled {
   justify-content: space-between;
   gap: 10px;
   color: var(--color-text);
-  font-weight: 900;
+  font-weight: 800;
+  font-size: 1.05rem;
+  padding: 4px 2px;
 }
 
 .calm-details summary::-webkit-details-marker {
@@ -944,13 +946,14 @@ textarea:disabled {
 
 .calm-details summary::after {
   content: "+";
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   border-radius: 999px;
   display: grid;
   place-items: center;
-  background: rgba(237, 233, 254, 0.78);
+  background: rgba(237, 233, 254, 0.58);
   color: #5960c9;
+  font-weight: 900;
 }
 
 .calm-details[open] summary::after {
@@ -959,6 +962,10 @@ textarea:disabled {
 
 .calm-details--card {
   display: block;
+  padding: 16px 18px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 20px rgba(124, 140, 255, 0.07);
 }
 
 .list--compact {
