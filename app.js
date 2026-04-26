@@ -1193,7 +1193,23 @@ function getCalendarBlocksForDate(dateValue) {
       repeatRule: block.repeatRule || null,
     }));
   const recurring = expandRecurringBlocksForDate(dateValue);
-  return [...direct, ...recurring];
+  return dedupeCalendarEvents([...direct, ...recurring]);
+}
+
+function eventSignature(event) {
+  return `${String(event.date || "").trim()}|${String(event.startTime || "").trim()}|${String(event.endTime || "").trim()}|${String(event.title || "").trim().toLowerCase()}`;
+}
+
+function dedupeCalendarEvents(events) {
+  const seen = new Set();
+  const deduped = [];
+  for (const event of events || []) {
+    const key = eventSignature(event);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(event);
+  }
+  return deduped;
 }
 
 function getCalendarDayIndicator(events) {
@@ -1331,6 +1347,7 @@ function getCategoryColorTone(category) {
   const value = String(category || "").toLowerCase();
   if (value.includes("exam")) return "exam";
   if (value.includes("assignment") || value.includes("project")) return "assignment";
+  if (value.includes("school")) return "school";
   if (value.includes("study") || value.includes("review") || value.includes("assignment")) return "study";
   if (value.includes("rest") || value.includes("break") || value.includes("free")) return "rest";
   if (value.includes("home")) return "home";
@@ -1368,7 +1385,7 @@ function toClock(minutes) {
   return `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
 }
 
-function findAvailableSlot(dateValue, durationMinutes, dayOffset, dayHeavyCount) {
+function findAvailableSlot(dateValue, durationMinutes, dayOffset, dayHeavyCount, generatedWindows = []) {
   const busy = getBusyWindows(dateValue);
   const minStart = 6 * 60;
   const maxEnd = 23 * 60;
@@ -1382,6 +1399,7 @@ function findAvailableSlot(dateValue, durationMinutes, dayOffset, dayHeavyCount)
     const start = candidateStarts[index];
     const end = start + durationMinutes;
     if (busy.some((windowItem) => overlapsWindow(start, end, windowItem))) continue;
+    if (hasConflict({ start, end }, generatedWindows)) continue;
     if (dayHeavyCount >= 3 && durationMinutes > 30) continue;
     return { start, end };
   }
@@ -1421,7 +1439,10 @@ function generateSmartStudySchedule({
       const isRestDay = preferredRestDays.includes(dayIndex);
       let dayMinutes = 0;
       let dayHeavyCount = 0;
+      let daySessionCount = 0;
+      const targetMinutes = Math.round(availableMinutesPerDay * 0.85);
       const subjectPool = rankedSubjects.length ? [...rankedSubjects] : [];
+      const generatedWindows = [];
       if (isRestDay) {
         generated.push(
           createCalendarEvent({
@@ -1435,12 +1456,13 @@ function generateSmartStudySchedule({
           })
         );
       }
-      while (dayMinutes < availableMinutesPerDay && (subjectPool.length || rankedAssignments.length)) {
+      while (dayMinutes < targetMinutes && daySessionCount < 3 && (subjectPool.length || rankedAssignments.length)) {
         const nextAssignment = rankedAssignments.find((item) => daysUntilDate(item.dueDate) >= 0 && daysUntilDate(item.dueDate) <= 6 + dayOffset);
-        if (nextAssignment && dayMinutes < availableMinutesPerDay) {
+        if (nextAssignment && dayMinutes < targetMinutes && daySessionCount < 3) {
           const chunkMinutes = Math.max(30, Math.min(60, Number(nextAssignment.estimatedHours || 1) * 30));
-          const slot = findAvailableSlot(dateValue, chunkMinutes, dayOffset + 2, dayHeavyCount);
+          const slot = findAvailableSlot(dateValue, chunkMinutes, dayOffset + 2, dayHeavyCount, generatedWindows);
           if (slot) {
+            generatedWindows.push({ start: slot.start, end: slot.end });
             generated.push(
               createCalendarEvent({
                 title: `${nextAssignment.title} work`,
@@ -1453,6 +1475,7 @@ function generateSmartStudySchedule({
               })
             );
             dayMinutes += chunkMinutes;
+            daySessionCount += 1;
             if (chunkMinutes >= 50) {
               const restStart = slot.end;
               const restEnd = Math.min(restStart + 10, 23 * 60);
@@ -1475,10 +1498,11 @@ function generateSmartStudySchedule({
         if (!subjectPool.length) break;
         const subject = subjectPool[dayOffset % subjectPool.length];
         const baseDuration = isRestDay ? 20 : dayHeavyCount >= 2 ? 25 : 50;
-        const durationMinutes = Math.min(baseDuration, availableMinutesPerDay - dayMinutes);
+        const durationMinutes = Math.min(baseDuration, targetMinutes - dayMinutes);
         if (durationMinutes < (isRestDay ? 15 : 25)) break;
-        const slot = findAvailableSlot(dateValue, durationMinutes, dayOffset + dayHeavyCount, dayHeavyCount);
+        const slot = findAvailableSlot(dateValue, durationMinutes, dayOffset + dayHeavyCount, dayHeavyCount, generatedWindows);
         if (!slot) break;
+        generatedWindows.push({ start: slot.start, end: slot.end });
 
         generated.push(
           createCalendarEvent({
@@ -1491,6 +1515,7 @@ function generateSmartStudySchedule({
             source: "ai",
           })
         );
+        daySessionCount += 1;
 
         if (durationMinutes >= 50) {
           const restStart = slot.end;
@@ -1512,9 +1537,10 @@ function generateSmartStudySchedule({
 
         dayMinutes += durationMinutes;
         dayHeavyCount += durationMinutes >= 45 ? 1 : 0;
-        if (dayHeavyCount >= 2 && dayMinutes < availableMinutesPerDay) {
-          const longRestSlot = findAvailableSlot(dateValue, 20, dayOffset + 3, dayHeavyCount);
+        if (dayHeavyCount >= 2 && dayMinutes < targetMinutes) {
+          const longRestSlot = findAvailableSlot(dateValue, 20, dayOffset + 3, dayHeavyCount, generatedWindows);
           if (longRestSlot) {
+            generatedWindows.push({ start: longRestSlot.start, end: longRestSlot.end });
             generated.push(
               createCalendarEvent({
                 title: "Brain reset",
@@ -1528,7 +1554,7 @@ function generateSmartStudySchedule({
             );
           }
         }
-        if (requestedHoursPerDay && dayMinutes >= availableMinutesPerDay) break;
+        if (requestedHoursPerDay && dayMinutes >= targetMinutes) break;
       }
     });
     rankedAssignments.forEach((assignment) => {
@@ -1553,11 +1579,15 @@ function generateSmartStudySchedule({
     appState.recurringBlocks = oldRecurring;
     appState.calendarBlocks = oldBlocks;
   }
-  return generated;
+  return dedupeCalendarEvents(generated);
 }
 
 function overlapsWindow(start, end, windowItem) {
   return start < windowItem.end && end > windowItem.start;
+}
+
+function hasConflict(newEvent, existingEvents) {
+  return (existingEvents || []).some((event) => newEvent.start < event.end && newEvent.end > event.start);
 }
 
 function assignStudyTime(dateValue, durationHours, usedWindows = []) {
@@ -2158,26 +2188,14 @@ function renderCalmHome({ nextExam, progress, focusTask, game }) {
         <strong class="summary-primary">${escapeHtml(focusTask ? focusTask.subject : text("freeDay"))}</strong>
         <p class="subtitle">${escapeHtml(focusTask ? `${formatHours(focusTask.duration)} · ${text("oneSession", "One focused session is enough to make progress.")}` : text("noTasksToday"))}</p>
       </article>
-      <div class="calm-grid">
-        <article class="card quiet-card">
-          <span class="helper">${escapeHtml(text("weeklyProgress"))}</span>
-          <div class="summary-row">
-            <strong>${progress}%</strong>
-            <span>${escapeHtml(game.tier.badge)} ${escapeHtml(game.level)}</span>
-          </div>
-          <div class="progress-bar"><span style="width:${progress}%;"></span></div>
-          <div class="compact-reward-strip">
-            <span>${escapeHtml(text("xpPoints"))}: ${game.xp}</span>
-            <span>${escapeHtml(text("coins"))}: ${game.coins}</span>
-            <span>${escapeHtml(text("studyStreak"))}: ${game.streak}</span>
-          </div>
-        </article>
-        <article class="card quiet-card">
-          <span class="helper">${escapeHtml(text("upcomingExams"))}</span>
-          <strong class="summary-primary">${escapeHtml(nextExam ? nextExam.subjectName : text("noSubjects"))}</strong>
-          <p class="subtitle">${escapeHtml(nextExam ? formatDate(nextExam.examDate) : text("addSubjectsDeadlineText"))}</p>
-        </article>
-      </div>
+      <article class="card quiet-card">
+        <div class="section-title">
+          <h3>${escapeHtml(text("weeklyProgress"))}</h3>
+          <span class="pill">${progress}%</span>
+        </div>
+        <div class="progress-bar"><span style="width:${progress}%;"></span></div>
+        <p class="microcopy">${escapeHtml(text("upcomingExams"))}: ${escapeHtml(nextExam ? `${nextExam.subjectName} · ${formatDate(nextExam.examDate)}` : text("addSubjectsDeadlineText"))}</p>
+      </article>
       <article class="card">
         <div class="section-title"><h3>${escapeHtml(text("quickActions"))}</h3></div>
         <div class="quick-action-grid quick-action-grid--calm">
@@ -2882,7 +2900,9 @@ function renderCalmCalendar({ monthDays, selectedEvents, selectedStudyHours, fre
   const aiPreviewDayBlocks = (appState.aiSchedulePreview?.events || [])
     .filter((event) => event.date === appState.selectedCalendarDate)
     .map((event) => ({ ...event, tone: getCategoryColorTone(event.category) }));
-  const dayTimelineEvents = [...selectedDayBlocks, ...selectedAssignments, ...aiPreviewDayBlocks];
+  const dayTimelineEvents = dedupeCalendarEvents([...selectedDayBlocks, ...selectedAssignments, ...aiPreviewDayBlocks]);
+  const visibleSelectedEvents = selectedEvents.slice(0, 5);
+  const overflowSelectedEvents = selectedEvents.slice(5);
   return `
     <section class="screen">
       <div class="screen-header screen-header--quiet">
@@ -2925,7 +2945,7 @@ function renderCalmCalendar({ monthDays, selectedEvents, selectedStudyHours, fre
         <div class="calendar-event-list">
           ${
             selectedEvents.length
-              ? selectedEvents
+              ? visibleSelectedEvents
                   .map(
                     (event) => `
                       <div class="calendar-event calendar-event--${event.tone || event.type}">
@@ -2937,7 +2957,19 @@ function renderCalmCalendar({ monthDays, selectedEvents, selectedStudyHours, fre
                       </div>
                     `
                   )
-                  .join("")
+                  .join("") + (overflowSelectedEvents.length
+                  ? `<details class="calm-details"><summary>Show ${overflowSelectedEvents.length} more</summary>${overflowSelectedEvents
+                      .map(
+                        (event) => `
+                          <div class="calendar-event calendar-event--${event.tone || event.type}">
+                            <strong>${escapeHtml(event.label)}</strong>
+                            <span>${escapeHtml(event.meta || "")}</span>
+                            ${event.notes ? `<p class="microcopy">${escapeHtml(event.notes)}</p>` : ""}
+                          </div>
+                        `
+                      )
+                      .join("")}</details>`
+                  : "")
               : `<div class="empty-state"><h3>🗓️ Nothing planned today</h3><p class="subtitle">Add subjects or busy blocks to organize your week.</p></div>`
           }
         </div>
@@ -2961,7 +2993,7 @@ function renderCalmCalendar({ monthDays, selectedEvents, selectedStudyHours, fre
         <summary>Day view</summary>
         ${renderDayTimeline(dayTimelineEvents)}
       </details>
-      <details class="card calm-details calm-details--card" open>
+      <details class="card calm-details calm-details--card">
         <summary>Weekly routine</summary>
         <form class="field-grid" data-form="weekly-routine" style="margin-top:14px;">
           <div class="field">
@@ -3744,7 +3776,15 @@ async function applyAiSchedulePreview() {
     return;
   }
   try {
+    const existing = [...(appState.calendarBlocks || [])];
+    await clearAiGeneratedCalendarBlocks();
+    const addedSignatures = new Set();
+    const existingSignatures = new Set(existing.filter((block) => !(block.source === "ai" || String(block.notes || "").includes("[source: ai]"))).map((block) => eventSignature(block)));
     for (const event of events) {
+      const signature = eventSignature(event);
+      if (existingSignatures.has(signature) || addedSignatures.has(signature)) {
+        continue;
+      }
       await apiRequest("/api/calendar-blocks", {
         method: "POST",
         body: {
@@ -3754,8 +3794,10 @@ async function applyAiSchedulePreview() {
           endTime: event.endTime,
           category: event.category,
           notes: `${event.notes || ""} [source: ai]`.trim(),
+          source: "ai",
         },
       });
+      addedSignatures.add(signature);
     }
     appState.aiSchedulePreview = null;
     await refreshBootstrap();
@@ -3764,6 +3806,13 @@ async function applyAiSchedulePreview() {
   } catch (error) {
     flashRequestError(error);
     renderApp();
+  }
+}
+
+async function clearAiGeneratedCalendarBlocks() {
+  const aiBlocks = (appState.calendarBlocks || []).filter((block) => block.source === "ai" || String(block.notes || "").includes("[source: ai]"));
+  for (const block of aiBlocks) {
+    await apiRequest(`/api/calendar-blocks/${block.id}`, { method: "DELETE", body: {} });
   }
 }
 
@@ -3778,7 +3827,7 @@ function addDemoSchoolRoutine() {
     startTime: "08:00",
     endTime: "17:00",
     notes: "Demo weekly routine",
-    repeat: "weekdays",
+    repeat: "weekly",
     repeatWeekdays: [0, 1, 4],
     repeatEndDate: "",
     source: "recurring",
@@ -3826,7 +3875,7 @@ function buildAiSchedulePreview(message = "") {
   return {
     sourceMessage: message,
     generatedAt: new Date().toISOString(),
-    events,
+    events: dedupeCalendarEvents(events),
   };
 }
 
@@ -3966,6 +4015,13 @@ async function handleFormSubmit(event) {
         category: data.category || text("busyBlock"),
         source: "manual",
       };
+      const candidateKey = eventSignature(payload);
+      const exists = (appState.calendarBlocks || []).some((block) => eventSignature(block) === candidateKey);
+      if (exists) {
+        setFlash("This event already exists in your calendar.", "warning");
+        renderApp();
+        return;
+      }
       await apiRequest("/api/calendar-blocks", {
         method: "POST",
         body: payload,
@@ -4104,10 +4160,13 @@ async function deleteSubject(subjectId) {
 }
 
 async function generatePlan() {
+  if (appState.planGenerating) return;
   appState.planGenerating = true;
   setFlash("Building your study plan…", "info");
   renderApp();
   try {
+    await clearAiGeneratedCalendarBlocks();
+    await refreshBootstrap();
     let response;
     if (appState.config.apiReady) {
       response = await apiRequest("/api/plan/generate", { method: "POST", body: {} });
@@ -4183,11 +4242,13 @@ async function resetLocalProgress() {
 }
 
 async function sendCoachMessage(message) {
+  if (appState.aiPending) return;
   const messageText = String(message || "");
   const scheduleIntent = /(schedule|calendar|organize my week|one hour daily|study time|put study time|assignment|project|due|lighter|off)/i.test(messageText);
   const assignmentIntent = /(assignment|project|due)/i.test(messageText);
   const restDays = detectRestDaysFromText(messageText);
   if (scheduleIntent) {
+    appState.aiPending = true;
     if (restDays.length) {
       appState.preferredRestDays = [...new Set([...(appState.preferredRestDays || []), ...restDays])];
       saveRestDays();
@@ -4210,6 +4271,7 @@ async function sendCoachMessage(message) {
     }
     const preview = buildAiSchedulePreview(message);
     if (!preview.events.length) {
+      appState.aiPending = false;
       setFlash("Your day looks full. I found no safe study window. Try light review or move a block.", "warning");
       return;
     }
@@ -4225,11 +4287,12 @@ async function sendCoachMessage(message) {
       {
         id: `chat_ai_${Date.now() + 1}`,
         role: "assistant",
-        message: `Let’s find your best study windows.\nI avoided your school hours and added rest so the plan stays realistic.\n${restDays.length ? "I kept your requested rest days lighter.\n" : ""}I found these study times for you. Add this to your calendar?`,
+        message: `Plan ready.\n- Busy/school time avoided\n- Rest included${restDays.length ? "\n- Rest days respected" : ""}\nChoose: Add to Calendar, Edit, or Skip.`,
         createdDate: new Date().toISOString(),
       },
     ];
     setFlash("I found these study times for you. Review and add when ready.", "info");
+    appState.aiPending = false;
     setRoute("calendar");
     return;
   }

@@ -14,6 +14,9 @@
   --color-success: #35c778;
   --color-warning: #f2a93b;
   --color-danger: #ef5d79;
+  --text-main: #172033;
+  --text-secondary: #5f6b7a;
+  --text-light: #9aa4b2;
   --shadow-soft: 0 22px 46px rgba(124, 140, 255, 0.18);
   --shadow-card: 0 18px 38px rgba(86, 103, 245, 0.11);
   --shadow-card-subtle: 0 12px 28px rgba(86, 103, 245, 0.08);
@@ -215,7 +218,7 @@ label.btn-secondary:focus-visible {
 .screen {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 18px;
   animation: screen-enter 240ms ease;
   line-height: 1.58;
 }
@@ -354,7 +357,7 @@ label.btn-secondary:focus-visible {
 .subtitle,
 .muted {
   margin: 0;
-  color: var(--color-muted);
+  color: var(--text-secondary);
   line-height: 1.62;
 }
 
@@ -496,7 +499,7 @@ label.btn-secondary:focus-visible {
   padding: 15px 18px;
   background: linear-gradient(135deg, var(--color-primary), #6cc7ff);
   color: white;
-  font-weight: 800;
+  font-weight: 500;
   font-size: 1rem;
   box-shadow: 0 16px 30px rgba(124, 140, 255, 0.28);
 }
@@ -517,8 +520,8 @@ textarea:disabled {
   border-radius: 20px;
   padding: 14px 18px;
   background: rgba(255, 255, 255, 0.72);
-  color: #5960c9;
-  font-weight: 800;
+  color: var(--text-secondary);
+  font-weight: 600;
   border: 1px solid rgba(124, 140, 255, 0.16);
   display: inline-grid;
   place-items: center;
@@ -543,7 +546,7 @@ textarea:disabled {
 .card,
 .plan-card,
 .subject-card {
-  padding: 22px;
+  padding: 18px;
 }
 
 .stats-grid,
@@ -594,12 +597,12 @@ textarea:disabled {
 .stack {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .calm-grid {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .quiet-card,
@@ -936,8 +939,8 @@ textarea:disabled {
   gap: 10px;
   color: var(--color-text);
   font-weight: 800;
-  font-size: 1.05rem;
-  padding: 4px 2px;
+  font-size: 0.96rem;
+  padding: 2px 1px;
 }
 
 .calm-details summary::-webkit-details-marker {
@@ -962,10 +965,10 @@ textarea:disabled {
 
 .calm-details--card {
   display: block;
-  padding: 16px 18px;
-  border-radius: 24px;
+  padding: 12px 14px;
+  border-radius: 18px;
   background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 10px 20px rgba(124, 140, 255, 0.07);
+  box-shadow: 0 6px 14px rgba(124, 140, 255, 0.07);
 }
 
 .list--compact {
@@ -1091,7 +1094,8 @@ textarea:disabled {
 
 .microcopy {
   font-size: 0.86rem;
-  color: var(--color-muted);
+  color: var(--text-light);
+  opacity: 0.9;
 }
 
 .divider {
@@ -1569,26 +1573,42 @@ textarea:disabled {
   border-radius: 18px;
   border: 1px solid rgba(237, 223, 244, 0.82);
   background: rgba(255, 255, 255, 0.72);
+  border-left-width: 4px;
+}
+
+.calendar-event strong {
+  color: var(--text-main);
+  font-weight: 600;
 }
 
 .calendar-event span,
 .calendar-event em {
-  color: var(--color-muted);
-  font-size: 0.86rem;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
   font-style: normal;
 }
 
 .calendar-event em {
-  color: #b15b12;
-  font-weight: 900;
+  color: var(--text-light);
+  font-weight: 500;
+  font-style: italic;
+}
+
+.calendar-event .microcopy {
+  color: var(--text-light);
+  font-size: 0.76rem;
+  font-weight: 400;
+  opacity: 0.9;
 }
 
 .calendar-event--exam {
-  background: rgba(255, 228, 239, 0.7);
+  background: rgba(255, 241, 246, 0.92);
+  border-left-color: rgba(239, 93, 121, 0.45);
 }
 
 .calendar-event--study {
-  background: rgba(223, 243, 255, 0.72);
+  background: rgba(240, 238, 255, 0.92);
+  border-left-color: rgba(124, 140, 255, 0.45);
 }
 
 .calendar-event--block {
@@ -1596,16 +1616,24 @@ textarea:disabled {
 }
 
 .calendar-event--busy {
-  background: rgba(226, 232, 240, 0.9);
+  background: rgba(241, 245, 249, 0.94);
+  border-left-color: rgba(100, 116, 139, 0.4);
 }
 
 .calendar-event--rest {
-  background: rgba(220, 252, 231, 0.86);
+  background: rgba(236, 253, 245, 0.92);
+  border-left-color: rgba(53, 199, 120, 0.42);
 }
 
 .calendar-event--assignment {
-  background: rgba(254, 243, 199, 0.9);
-  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(255, 247, 230, 0.94);
+  border-color: rgba(245, 158, 11, 0.24);
+  border-left-color: rgba(245, 158, 11, 0.45);
+}
+
+.calendar-event--school {
+  background: rgba(241, 245, 249, 0.94);
+  border-left-color: rgba(100, 116, 139, 0.42);
 }
 
 .calendar-event--home {
@@ -1614,13 +1642,13 @@ textarea:disabled {
 
 .day-timeline {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .day-hour-row {
   display: grid;
   grid-template-columns: 72px 1fr;
-  gap: 10px;
+  gap: 8px;
   align-items: start;
 }
 
@@ -1630,7 +1658,7 @@ textarea:disabled {
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.84);
   color: var(--color-text);
-  min-height: 42px;
+  min-height: 34px;
 }
 
 .day-hour-label {
@@ -1640,58 +1668,98 @@ textarea:disabled {
 .day-hour-empty {
   width: 100%;
   text-align: left;
-  padding: 10px 12px;
-  color: var(--color-muted);
+  padding: 7px 10px;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
 }
 
 .day-hour-events {
   display: grid;
-  gap: 8px;
+  gap: 5px;
+  max-height: 170px;
+  overflow-y: auto;
+  padding-right: 2px;
 }
 
 .day-event-block {
   border-radius: 12px;
-  padding: 10px 12px;
+  padding: 7px 9px;
   border: 1px solid rgba(226, 232, 240, 0.9);
+  border-left-width: 4px;
   display: grid;
-  gap: 4px;
+  gap: 2px;
+  min-height: 30px;
 }
 
 .day-event-block strong {
-  font-size: 0.92rem;
+  font-size: 0.84rem;
+  color: var(--text-main);
+  font-weight: 600;
 }
 
 .day-event-block span {
-  font-size: 0.82rem;
-  color: var(--color-muted);
+  font-size: 0.74rem;
+  color: var(--text-secondary);
 }
 
 .day-event-block--busy {
-  background: rgba(226, 232, 240, 0.9);
+  background: rgba(241, 245, 249, 0.94);
+  border-left-color: rgba(100, 116, 139, 0.4);
 }
 
 .day-event-block--study {
-  background: rgba(237, 233, 254, 0.92);
+  background: rgba(240, 238, 255, 0.92);
+  border-left-color: rgba(124, 140, 255, 0.45);
 }
 
 .day-event-block--exam {
-  background: rgba(255, 228, 239, 0.9);
+  background: rgba(255, 241, 246, 0.92);
+  border-left-color: rgba(239, 93, 121, 0.45);
 }
 
 .day-event-block--rest {
-  background: rgba(220, 252, 231, 0.9);
+  background: rgba(236, 253, 245, 0.92);
+  border-left-color: rgba(53, 199, 120, 0.42);
 }
 
 .day-event-block--assignment {
-  background: rgba(254, 243, 199, 0.95);
+  background: rgba(255, 247, 230, 0.94);
+  border-left-color: rgba(245, 158, 11, 0.45);
+}
+
+.day-event-block--school {
+  background: rgba(241, 245, 249, 0.94);
+  border-left-color: rgba(100, 116, 139, 0.42);
 }
 
 .day-event-block--home {
   background: rgba(255, 250, 240, 0.96);
 }
 
+.day-event-block--rest strong,
+.day-event-block--home strong {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.day-event-block--rest span,
+.day-event-block--home span {
+  color: var(--text-light);
+}
+
 .day-event-block--ai {
   border-color: rgba(108, 199, 255, 0.75);
+}
+
+.day-event-block--ai span,
+.calendar-event em {
+  color: var(--text-light);
+  font-weight: 400;
+}
+
+.calm-details h3 {
+  color: var(--text-main);
+  font-weight: 700;
 }
 
 [dir="rtl"] .task-card {
