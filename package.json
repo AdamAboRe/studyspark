@@ -1,0 +1,15 @@
+{
+  "name": "ai-study-planner",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mobile-first AI Study Planner with a local Node foundation for secure AI integration.",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js && node --check database.js && node --check app.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "google-auth-library": "^10.6.2",
+    "nodemailer": "^8.0.6"
+  }
+}

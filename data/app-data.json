@@ -1,0 +1,1841 @@
+{
+  "users": [
+    {
+      "id": "user_c6d871479b503621",
+      "fullName": "adama",
+      "email": "adamkirito987@gmail.com",
+      "passwordHash": "04376b0cc5930f56fc877b3488a79627:8ad85f1ac137445f6b1f3ff3bcda2f42d44140b85e6501ce6db39c98c57c0b9cf9cfb8d1c09fe15a8287154966fde10e050a8708080a96b0d5eaca1b47a4a7cb",
+      "academicLevel": "University",
+      "preferredLanguage": "English",
+      "studyGoal": "Exams",
+      "dailyAvailableHours": "5",
+      "createdDate": "2026-04-25T12:50:00.251Z"
+    },
+    {
+      "id": "user_264a4a2b3007dbf1",
+      "fullName": "adamaa",
+      "email": "adamcanva1@gmail.com",
+      "passwordHash": "050ea7a9ca9e8537c1ce9999acd8b62e:74e0a5f4240d46848ee912e0d9a1f4514059e32a5c1e751d950d2e3bd3445dfe4a4b56d9874958c42655edc0d62386f7d96bd2b31c257a008a89884ccfe57a00",
+      "academicLevel": "University",
+      "preferredLanguage": "English",
+      "studyGoal": "Exams",
+      "dailyAvailableHours": "5",
+      "createdDate": "2026-04-25T13:01:11.986Z"
+    },
+    {
+      "id": "user_0663e3b311feece7",
+      "fullName": "QA Student",
+      "email": "qa_338152084@example.com",
+      "passwordHash": "0655330c42255bcbf7f5f8f703849bbb:ca5f1dfe1f2c9f5a7caad9c127b815975b298804fe4c82abbcbac3429462d3161bfcab32c9a4bcb98370aaa9e239a7d2182330718441b2b0f9125110a6b8a176",
+      "academicLevel": "University",
+      "preferredLanguage": "Hebrew",
+      "studyGoal": "Exams",
+      "dailyAvailableHours": "3",
+      "createdDate": "2026-04-25T13:04:06.084Z"
+    },
+    {
+      "id": "user_d27f82028f033b18",
+      "fullName": "QA Student",
+      "email": "qa_389573965@example.com",
+      "passwordHash": "3724320ac5370a61f4635078ec60df55:0373ccc5578939da2f9180e264fc928750d05477970aa6ce4b41bdccc305d7e7612acd7169a9caf3f982fc37bd77dec24fd7a56bda9703f3bed459069bef8e56",
+      "academicLevel": "University",
+      "preferredLanguage": "Hebrew",
+      "studyGoal": "Exams",
+      "dailyAvailableHours": "3",
+      "createdDate": "2026-04-25T13:10:28.338Z"
+    },
+    {
+      "id": "user_ce09799924864a25",
+      "fullName": "mohammedaw1",
+      "email": "mohammedaw1@gmail.com",
+      "passwordHash": "ef842dadb1d1b221904a7cc1211e9cfc:89e501b8b47a72271581a567c03a0b1975726a5e36faa2c2b40bcd8dbd5f9834d69e79cc48cd578c239ee122c42fe3e90e30b3df17ce1034b31842e9bf6c99c2",
+      "academicLevel": "University",
+      "preferredLanguage": "English",
+      "studyGoal": "Daily study",
+      "dailyAvailableHours": "5",
+      "createdDate": "2026-04-25T13:18:35.240Z"
+    },
+    {
+      "id": "user_f5af69d4bf80cc3b",
+      "fullName": "adaaa",
+      "email": "adamcanvatest111@gmail.com",
+      "passwordHash": "02c072da5af8e2e07bea19bfe05eadb0:552f71545489cc44f449405a9cd626361a85db39637f9a83605849e7f1cb74cfdc27b34b209b1c7cb87132c493a7767eecf93746702964963afd3df06a5e69cb",
+      "academicLevel": "University",
+      "preferredLanguage": "English",
+      "studyGoal": "Exams",
+      "dailyAvailableHours": "5",
+      "createdDate": "2026-04-25T14:04:42.800Z"
+    },
+    {
+      "id": "user_6eeecf1eacf51cdf",
+      "fullName": "Cute QA Student",
+      "email": "cute_182684029@example.com",
+      "passwordHash": "17f7cd3f61c6fc3f57bff7025dc21b73:b24b94b005299bc76e53c9c9cd77306c264d5abd43ac75578bd74a7663112b9425fe702a22fb82e190a4e723d2750b0e2033866b2e315926e0ed88ea4f70b4d4",
+      "academicLevel": "University",
+      "preferredLanguage": "English",
+      "studyGoal": "Exams",
+      "dailyAvailableHours": "3",
+      "createdDate": "2026-04-25T15:39:41.062Z"
+    },
+    {
+      "id": "user_a9b2f6fa3c93a2b1",
+      "fullName": "Spark QA",
+      "email": "spark_1994201339@example.com",
+      "passwordHash": "e7d96c3330f636d81122e37e1df32bce:6ad802701b10b2fa2673031aedc21c10d1b9b3d3705f7dce075da4d0f12e5908b7594081bfb8f2caf7c75887fa32b35d90e21a4481f7bfcd045c1cb7103788f6",
+      "academicLevel": "University",
+      "preferredLanguage": "English",
+      "studyGoal": "Mixed",
+      "dailyAvailableHours": "3",
+      "createdDate": "2026-04-25T15:56:04.111Z"
+    },
+    {
+      "id": "user_ef548cd681f4baba",
+      "fullName": "Spark Final QA",
+      "email": "spark_final_566662709@example.com",
+      "passwordHash": "33e00e7dce782cb4f5c7648e82356caf:83f5d9d963815814d344adda87139c89f0bd4114b9af772fae7286d33b5bdea55fccb68b9ac4b456d88dc0222f30093752a28da99046346628ad7529e88fc4ae",
+      "academicLevel": "University",
+      "preferredLanguage": "English",
+      "studyGoal": "Mixed",
+      "dailyAvailableHours": "3",
+      "createdDate": "2026-04-25T15:57:54.385Z"
+    },
+    {
+      "id": "user_1dfdcd36a76f37d6",
+      "fullName": "kingjbar111",
+      "email": "kingjbar121@gmail.com",
+      "passwordHash": "65d58f93d846bade6e1dceff76295290:c4dab5d6094b55b2150ea154f5f66b011d38e085e2258fe2f980fc86a02b2518a74c1a4a7abe901ca2ee5efb02a5d1cbeb44731b097f50a71e93fa01664f2c68",
+      "academicLevel": "University",
+      "preferredLanguage": "English",
+      "studyGoal": "Exams",
+      "dailyAvailableHours": "5",
+      "createdDate": "2026-04-25T16:25:21.888Z"
+    }
+  ],
+  "subjects": [
+    {
+      "id": "subject_967ed05505e6daa0",
+      "userEmail": "adamkirito987@gmail.com",
+      "subjectName": "חשיבה עיצובית",
+      "examDate": "2026-06-15",
+      "difficulty": "Medium",
+      "priority": "Medium",
+      "dailyHours": "0.5",
+      "notes": "",
+      "createdDate": "2026-04-25T12:51:20.829Z"
+    },
+    {
+      "id": "subject_d24517def0344d7f",
+      "userEmail": "adamcanva1@gmail.com",
+      "subjectName": "Subject a",
+      "examDate": "2026-05-05",
+      "difficulty": "Hard",
+      "priority": "Low",
+      "dailyHours": "7.5",
+      "notes": "",
+      "createdDate": "2026-04-25T13:02:18.392Z"
+    },
+    {
+      "id": "subject_13f0b32dd5ba217c",
+      "userEmail": "qa_338152084@example.com",
+      "subjectName": "Math",
+      "examDate": "2026-05-10",
+      "difficulty": "Hard",
+      "priority": "High",
+      "dailyHours": "2",
+      "notes": "Focus on calculus",
+      "createdDate": "2026-04-25T13:04:06.108Z"
+    },
+    {
+      "id": "subject_f45f0072f78f6228",
+      "userEmail": "qa_389573965@example.com",
+      "subjectName": "Math",
+      "examDate": "2026-05-10",
+      "difficulty": "Hard",
+      "priority": "High",
+      "dailyHours": "2",
+      "notes": "Focus on calculus",
+      "createdDate": "2026-04-25T13:10:28.358Z"
+    },
+    {
+      "id": "subject_15d48c81c3d3a607",
+      "userEmail": "adamcanvatest111@gmail.com",
+      "subjectName": "Subject 1",
+      "examDate": "2026-06-15",
+      "difficulty": "Medium",
+      "priority": "Medium",
+      "dailyHours": "2",
+      "notes": "lazm n3ml ashe",
+      "createdDate": "2026-04-25T14:05:25.872Z"
+    },
+    {
+      "id": "subject_a658c9dc749e2c13",
+      "userEmail": "adamcanvatest111@gmail.com",
+      "subjectName": "Logic",
+      "examDate": "2026-07-14",
+      "difficulty": "Hard",
+      "priority": "Medium",
+      "dailyHours": "2",
+      "notes": "needed",
+      "createdDate": "2026-04-25T14:05:43.803Z"
+    },
+    {
+      "id": "subject_e441c1ca389b4466",
+      "userEmail": "cute_182684029@example.com",
+      "subjectName": "Biology",
+      "examDate": "2026-05-12",
+      "difficulty": "Medium",
+      "priority": "High",
+      "dailyHours": "1.5",
+      "notes": "Cell biology review",
+      "createdDate": "2026-04-25T15:39:41.087Z"
+    },
+    {
+      "id": "subject_1fefeb4d62abd320",
+      "userEmail": "spark_1994201339@example.com",
+      "subjectName": "Math",
+      "examDate": "2026-05-12",
+      "difficulty": "Hard",
+      "priority": "High",
+      "dailyHours": "2",
+      "notes": "Calculus",
+      "createdDate": "2026-04-25T15:56:04.133Z"
+    },
+    {
+      "id": "subject_91eed57242104f4d",
+      "userEmail": "spark_final_566662709@example.com",
+      "subjectName": "History",
+      "examDate": "2026-05-20",
+      "difficulty": "Medium",
+      "priority": "High",
+      "dailyHours": "1.5",
+      "notes": "Essay themes",
+      "createdDate": "2026-04-25T15:57:54.410Z"
+    }
+  ],
+  "plans": [
+    {
+      "id": "plan_76feed1c34bd2cae",
+      "userEmail": "qa_338152084@example.com",
+      "planTitle": "Personalized AI Study Plan",
+      "aiSummary": "This plan balances Exams with 3 available hours per day, while prioritizing Math.",
+      "weeklyPlan": [
+        {
+          "dayName": "Saturday",
+          "date": "2026-04-24T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Sunday",
+          "date": "2026-04-25T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Monday",
+          "date": "2026-04-26T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Tuesday",
+          "date": "2026-04-27T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Wednesday",
+          "date": "2026-04-28T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Thursday",
+          "date": "2026-04-29T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Friday",
+          "date": "2026-04-30T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        }
+      ],
+      "todayTasks": [
+        {
+          "id": "task_33481ef47a236ca3",
+          "userEmail": "qa_338152084@example.com",
+          "subject": "Math",
+          "date": "2026-04-24T21:00:00.000Z",
+          "duration": 2,
+          "status": "Not done",
+          "relatedPlan": "plan_76feed1c34bd2cae"
+        }
+      ],
+      "studyTips": [
+        "Start each session with the hardest topic while your focus is strongest.",
+        "Use 45 to 60 minute study blocks and keep breaks short and intentional.",
+        "Leave the final 10 minutes of each session for recap and self-testing."
+      ],
+      "motivationMessage": "QA, calm consistency beats last-minute stress. Follow the next small step and let progress build.",
+      "promptLog": {
+        "system": "You are an expert study planning assistant for students. Create realistic, balanced, and achievable study plans. Do not overload the student. Prioritize subjects with closer exam dates, higher difficulty, and higher priority. Keep the plan clear, motivating, and practical. Respond in the user's preferred language.",
+        "user": "Student profile:\nAcademic level: University\nPreferred language: Hebrew\nStudy goal: Exams\nDaily available hours: 3\n\nSubjects:\n- Math | Exam: 2026-05-10 | Difficulty: Hard | Priority: High | Daily hours: 2 | Notes: Focus on calculus\n\nPlease generate:\n1. AI Summary\n2. Weekly Study Plan\n3. Today's Tasks\n4. Study Tips\n5. Motivation message"
+      },
+      "createdDate": "2026-04-25T13:04:06.110Z",
+      "saved": true
+    },
+    {
+      "id": "plan_ca68c8572bd01101",
+      "userEmail": "qa_389573965@example.com",
+      "planTitle": "Personalized AI Study Plan",
+      "aiSummary": "This plan balances Exams with 3 available hours per day, while prioritizing Math.",
+      "weeklyPlan": [
+        {
+          "dayName": "Saturday",
+          "date": "2026-04-24T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Sunday",
+          "date": "2026-04-25T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Monday",
+          "date": "2026-04-26T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Tuesday",
+          "date": "2026-04-27T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Wednesday",
+          "date": "2026-04-28T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Thursday",
+          "date": "2026-04-29T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Friday",
+          "date": "2026-04-30T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        }
+      ],
+      "todayTasks": [
+        {
+          "id": "task_0713eae90746224f",
+          "userEmail": "qa_389573965@example.com",
+          "subject": "Math",
+          "date": "2026-04-24T21:00:00.000Z",
+          "duration": 2,
+          "status": "Not done",
+          "relatedPlan": "plan_ca68c8572bd01101"
+        }
+      ],
+      "studyTips": [
+        "Start each session with the hardest topic while your focus is strongest.",
+        "Use 45 to 60 minute study blocks and keep breaks short and intentional.",
+        "Leave the final 10 minutes of each session for recap and self-testing."
+      ],
+      "motivationMessage": "QA, calm consistency beats last-minute stress. Follow the next small step and let progress build.",
+      "promptLog": {
+        "system": "You are an expert study planning assistant for students. Create realistic, balanced, and achievable study plans. Do not overload the student. Prioritize subjects with closer exam dates, higher difficulty, and higher priority. Keep the plan clear, motivating, and practical. Respond in the user's preferred language.",
+        "user": "Student profile:\nAcademic level: University\nPreferred language: Hebrew\nStudy goal: Exams\nDaily available hours: 3\n\nSubjects:\n- Math | Exam: 2026-05-10 | Difficulty: Hard | Priority: High | Daily hours: 2 | Notes: Focus on calculus\n\nPlease generate:\n1. AI Summary\n2. Weekly Study Plan\n3. Today's Tasks\n4. Study Tips\n5. Motivation message"
+      },
+      "createdDate": "2026-04-25T13:10:28.359Z",
+      "saved": true
+    },
+    {
+      "id": "plan_28d2645be497a2a7",
+      "userEmail": "adamcanvatest111@gmail.com",
+      "planTitle": "Personalized AI Study Plan",
+      "aiSummary": "A 7-day study plan for a university student focusing on two exams: Subject 1 (exam 2026-06-15) and Logic (exam 2026-07-14). The plan allocates 5 study hours per day: 2 hours for Subject 1, 2 hours for Logic, and 1 hour for General Review to reinforce learning and maintain steady progress, with pacing that emphasizes Subject 1 as its exam approaches.",
+      "weeklyPlan": [
+        {
+          "dayName": "Monday",
+          "tasks": [
+            {
+              "subject": "Subject 1",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "Logic",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "General Review",
+              "duration": 1,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Tuesday",
+          "tasks": [
+            {
+              "subject": "Subject 1",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "Logic",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "General Review",
+              "duration": 1,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Wednesday",
+          "tasks": [
+            {
+              "subject": "Subject 1",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "Logic",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "General Review",
+              "duration": 1,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Thursday",
+          "tasks": [
+            {
+              "subject": "Subject 1",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "Logic",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "General Review",
+              "duration": 1,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Friday",
+          "tasks": [
+            {
+              "subject": "Subject 1",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "Logic",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "General Review",
+              "duration": 1,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Saturday",
+          "tasks": [
+            {
+              "subject": "Subject 1",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "Logic",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "General Review",
+              "duration": 1,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Sunday",
+          "tasks": [
+            {
+              "subject": "Subject 1",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "Logic",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "General Review",
+              "duration": 1,
+              "priority": "Medium"
+            }
+          ]
+        }
+      ],
+      "todayTasks": [
+        {
+          "id": "task_4386700a5ca5ea3b",
+          "userEmail": "adamcanvatest111@gmail.com",
+          "subject": "Subject 1",
+          "date": "2026-04-24T21:00:00.000Z",
+          "duration": 2,
+          "status": "Not done",
+          "relatedPlan": "plan_28d2645be497a2a7"
+        },
+        {
+          "id": "task_9ecdedd723b84b11",
+          "userEmail": "adamcanvatest111@gmail.com",
+          "subject": "Logic",
+          "date": "2026-04-24T21:00:00.000Z",
+          "duration": 2,
+          "status": "Not done",
+          "relatedPlan": "plan_28d2645be497a2a7"
+        },
+        {
+          "id": "task_57c17e1d090d06de",
+          "userEmail": "adamcanvatest111@gmail.com",
+          "subject": "General Review",
+          "date": "2026-04-24T21:00:00.000Z",
+          "duration": 1,
+          "status": "Not done",
+          "relatedPlan": "plan_28d2645be497a2a7"
+        }
+      ],
+      "studyTips": [
+        "Use active recall and spaced repetition to move information into long-term memory.",
+        "Practice with past papers under timed conditions to improve speed and accuracy.",
+        "Take short breaks (5-10 minutes) after each 50-60 minute study block to stay fresh."
+      ],
+      "motivationMessage": "Stay consistent and focused—your steady effort now will pay off on exam day. You’ve got this!",
+      "promptLog": {
+        "source": "puter",
+        "model": "gpt-5-nano"
+      },
+      "createdDate": "2026-04-25T14:06:46.894Z",
+      "saved": true
+    },
+    {
+      "id": "plan_bfaec8f00a9639c5",
+      "userEmail": "cute_182684029@example.com",
+      "planTitle": "Personalized AI Study Plan",
+      "aiSummary": "This plan balances Exams with 3 available hours per day, while prioritizing Biology.",
+      "weeklyPlan": [
+        {
+          "dayName": "Saturday",
+          "date": "2026-04-24T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Biology",
+              "duration": 1.5,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Sunday",
+          "date": "2026-04-25T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Biology",
+              "duration": 1.5,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Monday",
+          "date": "2026-04-26T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Biology",
+              "duration": 1.5,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Tuesday",
+          "date": "2026-04-27T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Biology",
+              "duration": 1.5,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Wednesday",
+          "date": "2026-04-28T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Biology",
+              "duration": 1.5,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Thursday",
+          "date": "2026-04-29T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Biology",
+              "duration": 1.5,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Friday",
+          "date": "2026-04-30T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Biology",
+              "duration": 1.5,
+              "priority": "High"
+            }
+          ]
+        }
+      ],
+      "todayTasks": [
+        {
+          "id": "task_8283ff2b107bca1e",
+          "userEmail": "cute_182684029@example.com",
+          "subject": "Biology",
+          "date": "2026-04-24T21:00:00.000Z",
+          "duration": 1.5,
+          "status": "Not done",
+          "relatedPlan": "plan_bfaec8f00a9639c5"
+        }
+      ],
+      "studyTips": [
+        "Start each session with the hardest topic while your focus is strongest.",
+        "Use 45 to 60 minute study blocks and keep breaks short and intentional.",
+        "Leave the final 10 minutes of each session for recap and self-testing."
+      ],
+      "motivationMessage": "Cute, calm consistency beats last-minute stress. Follow the next small step and let progress build.",
+      "promptLog": {
+        "system": "You are an expert study planning assistant for students. Create realistic, balanced, and achievable study plans. Do not overload the student. Prioritize subjects with closer exam dates, higher difficulty, and higher priority. Keep the plan clear, motivating, and practical. Respond in the user's preferred language.",
+        "user": "Student profile:\nAcademic level: University\nPreferred language: English\nStudy goal: Exams\nDaily available hours: 3\n\nSubjects:\n- Biology | Exam: 2026-05-12 | Difficulty: Medium | Priority: High | Daily hours: 1.5 | Notes: Cell biology review\n\nPlease generate:\n1. AI Summary\n2. Weekly Study Plan\n3. Today's Tasks\n4. Study Tips\n5. Motivation message"
+      },
+      "createdDate": "2026-04-25T15:39:41.090Z",
+      "saved": true
+    },
+    {
+      "id": "plan_590ec5f3c9050102",
+      "userEmail": "adamkirito987@gmail.com",
+      "planTitle": "Personalized AI Study Plan",
+      "aiSummary": "A concise, one-week study plan for a university student focusing on Design Thinking (חשיבה עיצובית). The goal is to prepare for the 2026-06-15 exam with a daily 0.5-hour study slot, fitting within a 5-hour daily study window. The plan emphasizes steady, manageable study sessions across the week.",
+      "weeklyPlan": [
+        {
+          "dayName": "Monday",
+          "tasks": [
+            {
+              "subject": "חשיבה עיצובית",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Tuesday",
+          "tasks": [
+            {
+              "subject": "חשיבה עיצובית",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Wednesday",
+          "tasks": [
+            {
+              "subject": "חשיבה עיצובית",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Thursday",
+          "tasks": [
+            {
+              "subject": "חשיבה עיצובית",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Friday",
+          "tasks": [
+            {
+              "subject": "חשיבה עיצובית",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Saturday",
+          "tasks": [
+            {
+              "subject": "חשיבה עיצובית",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Sunday",
+          "tasks": [
+            {
+              "subject": "חשיבה עיצובית",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        }
+      ],
+      "todayTasks": [
+        {
+          "id": "task_3cc1f6c5f5cc7aad",
+          "userEmail": "adamkirito987@gmail.com",
+          "subject": "חשיבה עיצובית",
+          "date": "2026-04-24T21:00:00.000Z",
+          "duration": 0.5,
+          "status": "Not done",
+          "relatedPlan": "plan_590ec5f3c9050102"
+        }
+      ],
+      "studyTips": [
+        "Break study into focused 25-minute chunks with short breaks to improve retention.",
+        "Use active recall and spaced repetition; review practice questions for Design Thinking.",
+        "Summarize key concepts in your own words and test yourself to strengthen memory."
+      ],
+      "motivationMessage": "Small, consistent steps today add up to big gains for your exam.",
+      "promptLog": {
+        "source": "puter",
+        "model": "gpt-5-nano"
+      },
+      "createdDate": "2026-04-25T15:42:36.649Z",
+      "saved": true
+    },
+    {
+      "id": "plan_d5b6392a57bb5054",
+      "userEmail": "spark_1994201339@example.com",
+      "planTitle": "Personalized AI Study Plan",
+      "aiSummary": "This plan balances Mixed with 3 available hours per day, while prioritizing Math.",
+      "weeklyPlan": [
+        {
+          "dayName": "Saturday",
+          "date": "2026-04-24T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Sunday",
+          "date": "2026-04-25T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Monday",
+          "date": "2026-04-26T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Tuesday",
+          "date": "2026-04-27T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Wednesday",
+          "date": "2026-04-28T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Thursday",
+          "date": "2026-04-29T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Friday",
+          "date": "2026-04-30T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "Math",
+              "duration": 2,
+              "priority": "High"
+            }
+          ]
+        }
+      ],
+      "todayTasks": [
+        {
+          "id": "task_380d8042f494b38e",
+          "userEmail": "spark_1994201339@example.com",
+          "subject": "Math",
+          "date": "2026-04-24T21:00:00.000Z",
+          "duration": 2,
+          "status": "Not done",
+          "relatedPlan": "plan_d5b6392a57bb5054"
+        }
+      ],
+      "studyTips": [
+        "Start each session with the hardest topic while your focus is strongest.",
+        "Use 45 to 60 minute study blocks and keep breaks short and intentional.",
+        "Leave the final 10 minutes of each session for recap and self-testing."
+      ],
+      "motivationMessage": "Spark, calm consistency beats last-minute stress. Follow the next small step and let progress build.",
+      "promptLog": {
+        "system": "You are an expert study planning assistant for students. Create realistic, balanced, and achievable study plans. Do not overload the student. Prioritize subjects with closer exam dates, higher difficulty, and higher priority. Keep the plan clear, motivating, and practical. Respond in the user's preferred language.",
+        "user": "Student profile:\nAcademic level: University\nPreferred language: English\nStudy goal: Mixed\nDaily available hours: 3\n\nSubjects:\n- Math | Exam: 2026-05-12 | Difficulty: Hard | Priority: High | Daily hours: 2 | Notes: Calculus\n\nPlease generate:\n1. AI Summary\n2. Weekly Study Plan\n3. Today's Tasks\n4. Study Tips\n5. Motivation message"
+      },
+      "createdDate": "2026-04-25T15:56:04.135Z",
+      "saved": true
+    },
+    {
+      "id": "plan_53fc5201fab3661d",
+      "userEmail": "spark_final_566662709@example.com",
+      "planTitle": "Personalized AI Study Plan",
+      "aiSummary": "This plan balances Mixed with 3 available hours per day, while prioritizing History.",
+      "weeklyPlan": [
+        {
+          "dayName": "Saturday",
+          "date": "2026-04-24T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "History",
+              "duration": 1.5,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Sunday",
+          "date": "2026-04-25T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "History",
+              "duration": 1.5,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Monday",
+          "date": "2026-04-26T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "History",
+              "duration": 1.5,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Tuesday",
+          "date": "2026-04-27T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "History",
+              "duration": 1.5,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Wednesday",
+          "date": "2026-04-28T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "History",
+              "duration": 1.5,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Thursday",
+          "date": "2026-04-29T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "History",
+              "duration": 1.5,
+              "priority": "High"
+            }
+          ]
+        },
+        {
+          "dayName": "Friday",
+          "date": "2026-04-30T21:00:00.000Z",
+          "tasks": [
+            {
+              "subject": "History",
+              "duration": 1.5,
+              "priority": "High"
+            }
+          ]
+        }
+      ],
+      "todayTasks": [
+        {
+          "id": "task_4e8750966abde01b",
+          "userEmail": "spark_final_566662709@example.com",
+          "subject": "History",
+          "date": "2026-04-24T21:00:00.000Z",
+          "duration": 1.5,
+          "status": "Not done",
+          "relatedPlan": "plan_53fc5201fab3661d"
+        }
+      ],
+      "studyTips": [
+        "Start each session with the hardest topic while your focus is strongest.",
+        "Use 45 to 60 minute study blocks and keep breaks short and intentional.",
+        "Leave the final 10 minutes of each session for recap and self-testing."
+      ],
+      "motivationMessage": "Spark, calm consistency beats last-minute stress. Follow the next small step and let progress build.",
+      "promptLog": {
+        "system": "You are an expert study planning assistant for students. Create realistic, balanced, and achievable study plans. Do not overload the student. Prioritize subjects with closer exam dates, higher difficulty, and higher priority. Keep the plan clear, motivating, and practical. Respond in the user's preferred language.",
+        "user": "Student profile:\nAcademic level: University\nPreferred language: English\nStudy goal: Mixed\nDaily available hours: 3\n\nSubjects:\n- History | Exam: 2026-05-20 | Difficulty: Medium | Priority: High | Daily hours: 1.5 | Notes: Essay themes\n\nPlease generate:\n1. AI Summary\n2. Weekly Study Plan\n3. Today's Tasks\n4. Study Tips\n5. Motivation message"
+      },
+      "createdDate": "2026-04-25T15:57:54.412Z",
+      "saved": true
+    },
+    {
+      "id": "plan_0f59c9e6c72a7c82",
+      "userEmail": "adamkirito987@gmail.com",
+      "planTitle": "Personalized AI Study Plan",
+      "aiSummary": "University student with exams as the goal, available 5 hours daily. The only subject is Design Thinking (Hebrew: חשיבה עיצובית) with an exam on 2026-06-15, difficulty and priority set to Medium. Proposed plan allocates 0.5 hours per day to Design Thinking and 4.5 hours to general exam prep, totaling the user's 5-hour daily window while ensuring consistent progress toward the exam date.",
+      "weeklyPlan": [
+        {
+          "dayName": "Monday",
+          "tasks": [
+            {
+              "subject": "Design Thinking",
+              "duration": 0.5,
+              "priority": "Medium"
+            },
+            {
+              "subject": "General Exam Prep",
+              "duration": 4.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Tuesday",
+          "tasks": [
+            {
+              "subject": "Design Thinking",
+              "duration": 0.5,
+              "priority": "Medium"
+            },
+            {
+              "subject": "General Exam Prep",
+              "duration": 4.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Wednesday",
+          "tasks": [
+            {
+              "subject": "Design Thinking",
+              "duration": 0.5,
+              "priority": "Medium"
+            },
+            {
+              "subject": "General Exam Prep",
+              "duration": 4.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Thursday",
+          "tasks": [
+            {
+              "subject": "Design Thinking",
+              "duration": 0.5,
+              "priority": "Medium"
+            },
+            {
+              "subject": "General Exam Prep",
+              "duration": 4.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Friday",
+          "tasks": [
+            {
+              "subject": "Design Thinking",
+              "duration": 0.5,
+              "priority": "Medium"
+            },
+            {
+              "subject": "General Exam Prep",
+              "duration": 4.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Saturday",
+          "tasks": [
+            {
+              "subject": "Design Thinking",
+              "duration": 0.5,
+              "priority": "Medium"
+            },
+            {
+              "subject": "General Exam Prep",
+              "duration": 4.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Sunday",
+          "tasks": [
+            {
+              "subject": "Design Thinking",
+              "duration": 0.5,
+              "priority": "Medium"
+            },
+            {
+              "subject": "General Exam Prep",
+              "duration": 4.5,
+              "priority": "Medium"
+            }
+          ]
+        }
+      ],
+      "todayTasks": [
+        {
+          "id": "task_ea13e208a7e8d180",
+          "userEmail": "adamkirito987@gmail.com",
+          "subject": "Design Thinking",
+          "date": "2026-04-24T21:00:00.000Z",
+          "duration": 0.5,
+          "status": "Not done",
+          "relatedPlan": "plan_0f59c9e6c72a7c82"
+        },
+        {
+          "id": "task_d2baae750b140e1f",
+          "userEmail": "adamkirito987@gmail.com",
+          "subject": "General Exam Prep",
+          "date": "2026-04-24T21:00:00.000Z",
+          "duration": 4.5,
+          "status": "Not done",
+          "relatedPlan": "plan_0f59c9e6c72a7c82"
+        }
+      ],
+      "studyTips": [
+        "Use active recall and spaced repetition to reinforce Design Thinking concepts.",
+        "Work on past exam questions under timed conditions to build familiarity with question formats and time management.",
+        "Create a concise one-page syllabus with key frameworks, heuristics, and case examples to review quickly before exams."
+      ],
+      "motivationMessage": "You've got this—steady daily effort will compound into solid exam performance.",
+      "promptLog": {
+        "source": "puter",
+        "model": "gpt-5-nano"
+      },
+      "createdDate": "2026-04-25T15:59:20.386Z",
+      "saved": true
+    },
+    {
+      "id": "plan_57c47f842d20bf28",
+      "userEmail": "adamkirito987@gmail.com",
+      "planTitle": "Personalized AI Study Plan",
+      "aiSummary": "A 7-day lightweight study plan for Design Thinking (חשיבה עיצובית) to prepare for the 2026-06-15 exam. It assigns 0.5 hours per day to this subject, creating a consistent daily habit within your 5-hour window and gradually building understanding for the exam.",
+      "weeklyPlan": [
+        {
+          "dayName": "Monday",
+          "tasks": [
+            {
+              "subject": "Design Thinking",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Tuesday",
+          "tasks": [
+            {
+              "subject": "Design Thinking",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Wednesday",
+          "tasks": [
+            {
+              "subject": "Design Thinking",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Thursday",
+          "tasks": [
+            {
+              "subject": "Design Thinking",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Friday",
+          "tasks": [
+            {
+              "subject": "Design Thinking",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Saturday",
+          "tasks": [
+            {
+              "subject": "Design Thinking",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Sunday",
+          "tasks": [
+            {
+              "subject": "Design Thinking",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        }
+      ],
+      "todayTasks": [
+        {
+          "id": "task_251b38594842aa96",
+          "userEmail": "adamkirito987@gmail.com",
+          "subject": "Design Thinking",
+          "date": "2026-04-24T21:00:00.000Z",
+          "duration": 0.5,
+          "status": "Not done",
+          "relatedPlan": "plan_57c47f842d20bf28"
+        }
+      ],
+      "studyTips": [
+        "Break the Design Thinking material into the five stages: empathize, define, ideate, prototype, and test.",
+        "Create a one-page concept summary after each session to reinforce key takeaways.",
+        "Schedule quick, spaced reviews to reinforce learning and prevent forgetting."
+      ],
+      "motivationMessage": "You’ve got this—consistent, focused daily practice will compound into strong exam performance.",
+      "promptLog": {
+        "source": "puter",
+        "model": "gpt-5-nano"
+      },
+      "createdDate": "2026-04-25T15:59:24.781Z",
+      "saved": true
+    },
+    {
+      "id": "plan_eea421fc4bc2f70a",
+      "userEmail": "adamkirito987@gmail.com",
+      "planTitle": "Personalized AI Study Plan",
+      "aiSummary": "A 7-day study plan optimized for a 5-hour daily window, focusing on חשיבה עיצובית to prepare for the 2026-06-15 exam. Each day includes a 0.5-hour core block for החשיבה עיצובית and additional related practice to fill the 5 hours.",
+      "weeklyPlan": [
+        {
+          "dayName": "Monday",
+          "tasks": [
+            {
+              "subject": "חשיבה עיצובית",
+              "duration": 0.5,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - הבנת מושגים",
+              "duration": 1,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - תרגול מקרים",
+              "duration": 1,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - תכנון והערכת תוצרים",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - שאלות מצטברות",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Tuesday",
+          "tasks": [
+            {
+              "subject": "חשיבה עיצובית",
+              "duration": 0.5,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - הבנת מושגים",
+              "duration": 1,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - תרגול מקרים",
+              "duration": 1,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - תכנון והערכת תוצרים",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - שאלות מצטברות",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Wednesday",
+          "tasks": [
+            {
+              "subject": "חשיבה עיצובית",
+              "duration": 0.5,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - הבנת מושגים",
+              "duration": 1,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - תרגול מקרים",
+              "duration": 1,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - תכנון והערכת תוצרים",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - שאלות מצטברות",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Thursday",
+          "tasks": [
+            {
+              "subject": "חשיבה עיצובית",
+              "duration": 0.5,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - הבנת מושגים",
+              "duration": 1,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - תרגול מקרים",
+              "duration": 1,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - תכנון והערכת תוצרים",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - שאלות מצטברות",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Friday",
+          "tasks": [
+            {
+              "subject": "חשיבה עיצובית",
+              "duration": 0.5,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - הבנת מושגים",
+              "duration": 1,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - תרגול מקרים",
+              "duration": 1,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - תכנון והערכת תוצרים",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - שאלות מצטברות",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Saturday",
+          "tasks": [
+            {
+              "subject": "חשיבה עיצובית",
+              "duration": 0.5,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - הבנת מושגים",
+              "duration": 1,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - תרגול מקרים",
+              "duration": 1,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - תכנון והערכת תוצרים",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - שאלות מצטברות",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        },
+        {
+          "dayName": "Sunday",
+          "tasks": [
+            {
+              "subject": "חשיבה עיצובית",
+              "duration": 0.5,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - הבנת מושגים",
+              "duration": 1,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - תרגול מקרים",
+              "duration": 1,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - תכנון והערכת תוצרים",
+              "duration": 2,
+              "priority": "Medium"
+            },
+            {
+              "subject": "חשיבה עיצובית - שאלות מצטברות",
+              "duration": 0.5,
+              "priority": "Medium"
+            }
+          ]
+        }
+      ],
+      "todayTasks": [
+        {
+          "id": "task_8e9b8b405df539b8",
+          "userEmail": "adamkirito987@gmail.com",
+          "subject": "חשיבה עיצובית",
+          "date": "2026-04-24T21:00:00.000Z",
+          "duration": 0.5,
+          "status": "Not done",
+          "relatedPlan": "plan_eea421fc4bc2f70a"
+        }
+      ],
+      "studyTips": [
+        "Use the 25/5 technique: study in focused 25-minute blocks with 5-minute breaks.",
+        "Summarize concepts in your own words and create quick flashcards for חשיבה עיצובית.",
+        "Review a past exam question to connect theory with practice."
+      ],
+      "motivationMessage": "Stay consistent. Small daily gains compound into exam readiness for the 2026-06-15 exam.",
+      "promptLog": {
+        "source": "puter",
+        "model": "gpt-5-nano"
+      },
+      "createdDate": "2026-04-25T15:59:35.140Z",
+      "saved": true
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task_33481ef47a236ca3",
+      "userEmail": "qa_338152084@example.com",
+      "subject": "Math",
+      "date": "2026-04-24T21:00:00.000Z",
+      "duration": 2,
+      "status": "Done",
+      "relatedPlan": "plan_76feed1c34bd2cae"
+    },
+    {
+      "id": "task_0713eae90746224f",
+      "userEmail": "qa_389573965@example.com",
+      "subject": "Math",
+      "date": "2026-04-24T21:00:00.000Z",
+      "duration": 2,
+      "status": "Not done",
+      "relatedPlan": "plan_ca68c8572bd01101"
+    },
+    {
+      "id": "task_4386700a5ca5ea3b",
+      "userEmail": "adamcanvatest111@gmail.com",
+      "subject": "Subject 1",
+      "date": "2026-04-24T21:00:00.000Z",
+      "duration": 2,
+      "status": "Not done",
+      "relatedPlan": "plan_28d2645be497a2a7"
+    },
+    {
+      "id": "task_9ecdedd723b84b11",
+      "userEmail": "adamcanvatest111@gmail.com",
+      "subject": "Logic",
+      "date": "2026-04-24T21:00:00.000Z",
+      "duration": 2,
+      "status": "Not done",
+      "relatedPlan": "plan_28d2645be497a2a7"
+    },
+    {
+      "id": "task_57c17e1d090d06de",
+      "userEmail": "adamcanvatest111@gmail.com",
+      "subject": "General Review",
+      "date": "2026-04-24T21:00:00.000Z",
+      "duration": 1,
+      "status": "Not done",
+      "relatedPlan": "plan_28d2645be497a2a7"
+    },
+    {
+      "id": "task_8283ff2b107bca1e",
+      "userEmail": "cute_182684029@example.com",
+      "subject": "Biology",
+      "date": "2026-04-24T21:00:00.000Z",
+      "duration": 1.5,
+      "status": "Not done",
+      "relatedPlan": "plan_bfaec8f00a9639c5"
+    },
+    {
+      "id": "task_3cc1f6c5f5cc7aad",
+      "userEmail": "adamkirito987@gmail.com",
+      "subject": "חשיבה עיצובית",
+      "date": "2026-04-24T21:00:00.000Z",
+      "duration": 0.5,
+      "status": "Not done",
+      "relatedPlan": "plan_590ec5f3c9050102"
+    },
+    {
+      "id": "task_380d8042f494b38e",
+      "userEmail": "spark_1994201339@example.com",
+      "subject": "Math",
+      "date": "2026-04-24T21:00:00.000Z",
+      "duration": 2,
+      "status": "Not done",
+      "relatedPlan": "plan_d5b6392a57bb5054"
+    },
+    {
+      "id": "task_4e8750966abde01b",
+      "userEmail": "spark_final_566662709@example.com",
+      "subject": "History",
+      "date": "2026-04-24T21:00:00.000Z",
+      "duration": 1.5,
+      "status": "Not done",
+      "relatedPlan": "plan_53fc5201fab3661d"
+    },
+    {
+      "id": "task_ea13e208a7e8d180",
+      "userEmail": "adamkirito987@gmail.com",
+      "subject": "Design Thinking",
+      "date": "2026-04-24T21:00:00.000Z",
+      "duration": 0.5,
+      "status": "Not done",
+      "relatedPlan": "plan_0f59c9e6c72a7c82"
+    },
+    {
+      "id": "task_d2baae750b140e1f",
+      "userEmail": "adamkirito987@gmail.com",
+      "subject": "General Exam Prep",
+      "date": "2026-04-24T21:00:00.000Z",
+      "duration": 4.5,
+      "status": "Not done",
+      "relatedPlan": "plan_0f59c9e6c72a7c82"
+    },
+    {
+      "id": "task_251b38594842aa96",
+      "userEmail": "adamkirito987@gmail.com",
+      "subject": "Design Thinking",
+      "date": "2026-04-24T21:00:00.000Z",
+      "duration": 0.5,
+      "status": "Not done",
+      "relatedPlan": "plan_57c47f842d20bf28"
+    },
+    {
+      "id": "task_8e9b8b405df539b8",
+      "userEmail": "adamkirito987@gmail.com",
+      "subject": "חשיבה עיצובית",
+      "date": "2026-04-24T21:00:00.000Z",
+      "duration": 0.5,
+      "status": "Not done",
+      "relatedPlan": "plan_eea421fc4bc2f70a"
+    }
+  ],
+  "sessions": [
+    {
+      "token": "360e6830f36295ca8065932cb630471aa1b6cd142e17d973",
+      "userId": "user_c6d871479b503621",
+      "createdDate": "2026-04-25T12:50:00.252Z"
+    },
+    {
+      "token": "dff89366538d74b3055bf5d33c63af304391df363c530fd2",
+      "userId": "user_264a4a2b3007dbf1",
+      "createdDate": "2026-04-25T13:01:11.986Z"
+    },
+    {
+      "token": "b5f49c3c1cb64f5579a34255c4256388abe7e2d687945395",
+      "userId": "user_0663e3b311feece7",
+      "createdDate": "2026-04-25T13:04:06.084Z"
+    },
+    {
+      "token": "cad4b789b0f8d424220a743fc883e4fddaa16119a1498d13",
+      "userId": "user_d27f82028f033b18",
+      "createdDate": "2026-04-25T13:10:28.338Z"
+    },
+    {
+      "token": "de050442576ed0e559a4c684de80ca34d91ce77b8fd84dd3",
+      "userId": "user_f5af69d4bf80cc3b",
+      "createdDate": "2026-04-25T14:18:02.847Z"
+    },
+    {
+      "token": "aa7f85dd5b7996a4d81c0bc48417770d4454e7896a763f59",
+      "userId": "user_6eeecf1eacf51cdf",
+      "createdDate": "2026-04-25T15:39:41.062Z"
+    },
+    {
+      "token": "31743a8bb33da8fe121c8fb71c2ceaa22046af8a61fcd22d",
+      "userId": "user_a9b2f6fa3c93a2b1",
+      "createdDate": "2026-04-25T15:56:04.111Z"
+    },
+    {
+      "token": "88fcc7dbd89acb4fad51e7e27bf2b1f4286f9a0ff226f7c7",
+      "userId": "user_ef548cd681f4baba",
+      "createdDate": "2026-04-25T15:57:54.386Z"
+    }
+  ],
+  "chatHistory": [
+    {
+      "id": "chat_7f70aca5e1f21196",
+      "userEmail": "adamkirito987@gmail.com",
+      "role": "user",
+      "message": "תעזור לי להבין",
+      "createdDate": "2026-04-25T12:51:40.880Z"
+    },
+    {
+      "id": "chat_cc1d51bdd837f354",
+      "userEmail": "adamkirito987@gmail.com",
+      "role": "assistant",
+      "message": "adama, a good next step is to focus on חשיבה עיצובית first because its exam is closer. Aim for one short focused block today, then ask me for help with revision strategy, weak topics, or how to divide your week.",
+      "createdDate": "2026-04-25T12:51:40.880Z",
+      "source": "local",
+      "model": null
+    },
+    {
+      "id": "chat_2a8edad09b848f57",
+      "userEmail": "qa_338152084@example.com",
+      "role": "user",
+      "message": "Help me study for math this week",
+      "createdDate": "2026-04-25T13:04:06.121Z"
+    },
+    {
+      "id": "chat_4e16c9c6e3308999",
+      "userEmail": "qa_338152084@example.com",
+      "role": "assistant",
+      "message": "QA, a good next step is to focus on Math first because its exam is closer. Aim for one short focused block today, then ask me for help with revision strategy, weak topics, or how to divide your week.",
+      "createdDate": "2026-04-25T13:04:06.121Z",
+      "source": "local",
+      "model": null
+    },
+    {
+      "id": "chat_2d5ac993d95f2ea5",
+      "userEmail": "qa_389573965@example.com",
+      "role": "user",
+      "message": "Make this week calmer",
+      "createdDate": "2026-04-25T13:10:28.365Z"
+    },
+    {
+      "id": "chat_ddc398c86fb52863",
+      "userEmail": "qa_389573965@example.com",
+      "role": "assistant",
+      "message": "QA, a good next step is to focus on Math first because its exam is closer. Aim for one short focused block today, then ask me for help with revision strategy, weak topics, or how to divide your week.",
+      "createdDate": "2026-04-25T13:10:28.365Z",
+      "source": "local",
+      "model": null
+    },
+    {
+      "id": "chat_1ab462fdaad1419a",
+      "userEmail": "mohammedaw1@gmail.com",
+      "role": "user",
+      "message": "how i can study for a big exam in 2 days",
+      "createdDate": "2026-04-25T13:19:46.396Z"
+    },
+    {
+      "id": "chat_3315510e2c87e9f1",
+      "userEmail": "mohammedaw1@gmail.com",
+      "role": "assistant",
+      "message": "You’ve got this. In two days, focused, high-yield prep plus active practice can make a big difference. Here’s a practical, no-fluss plan you can use right away.\n\nWhat to do first\n- Get the basics: print or open your syllabus, can you access past papers or example questions, and gather any formula sheets or key notes.\n- Identify high-yield topics: scan past papers or your notes and pick 3–5 topics that tend to show up or that you feel less confident about.\n- Create a simple 1-page cheat sheet: 1 page of formulas, key concepts, common question types—this reinforces memory and gives you quick reviews.\n\nTwo-day study plan (about 5 hours per day)\nDay 1\n- Block 1 (60 min): Quick topic scan + deep dive into Topic A\n  - Review core concepts in 1 topic (use notes, a diagram, or a concept map).\n- Break (10–15 min)\n- Block 2 (60 min): Practice Topic A\n  - Do 6–10 short problems or a few past questions. Focus on applying the concepts.\n- Break (10–15 min)\n- Block 3 (60 min): Topic B\n  - Same approach as Topic A (brief review + targeted practice).\n- Break (10–15 min)\n- Block 4 (60 min): Topic B practice\n  - 6–10 problems or a mini past-paper set.\n- Break (10–15 min)\n- Block 5 (40–50 min): Review + cheat sheet\n  - Note mistakes, fill gaps, tighten your one-page sheet.\n\nDay 2\n- Block 1 (60 min): Timed past-paper or mixed questions (Section 1)\n  - Do 1 timed block similar to exam conditions if you can.\n- Break (10–15 min)\n- Block 2 (60 min): Review answers and fix gaps\n  - Read solutions, note where you went wrong, re-do tricky questions.\n- Break (10–15 min)\n- Block 3 (60 min): Timed second pass\n  - Another block of past questions or a different topic set, under timed conditions.\n- Break (10–15 min)\n- Block 4 (40–50 min): Final review of error log + cheat sheet\n  - Tighten notes on the most common mistakes.\n- Break (10 min)\n- Block 5 (40–50 min): Full quick mock exam or rapid-fire recap\n  - Do a short practice set or run through your cheat sheet aloud; simulate exam stress to build familiarity, then wind down.\n\nKey study techniques to use now\n- Active recall: after you review a topic, close your notes and summarize it from memory.\n- Practice, not just reread: aim to solve problems or answer questions rather than passively reading.\n- Spaced-ish review: at the end of each block, jot a couple of quick questions you still find tricky and target them tomorrow.\n- Explain it simply: use the Feynman technique—explain the concept to yourself in plain language or pretend you’re teaching someone else.\n- Mistake log: every time you get something wrong, write down what tripped you and how to fix it.\n\nExam-day mindset tips\n- Read instructions first, skim the whole paper, and mark easy questions to secure quick marks.\n- Allocate time by section and keep a rough pace; don’t get stuck on one hard problem.\n- If you’re stuck, move on and come back later with fresh eyes.\n- Stay calm: breathe, drink water, and trust your preparation.\n\nWhat I can tailor for you\n- Tell me your subject and any topics you’re worried about.\n- Do you have past papers or a syllabus? If yes, share the topics or questions you’ve seen most often.\n- I can adjust the two-day plan to fit your exact topics and the exam format.\n\nYou’re capable of making the most of these 2 days. Ready to share your subject and any materials you have so I tailor the plan even more precisely?",
+      "createdDate": "2026-04-25T13:19:46.396Z",
+      "source": "puter",
+      "model": "gpt-5-nano"
+    },
+    {
+      "id": "chat_28f198375033f799",
+      "userEmail": "adamcanvatest111@gmail.com",
+      "role": "user",
+      "message": "hi how are you",
+      "createdDate": "2026-04-25T14:06:41.992Z"
+    },
+    {
+      "id": "chat_a9dab62cf720a110",
+      "userEmail": "adamcanvatest111@gmail.com",
+      "role": "assistant",
+      "message": "Hi adaaa! I’m doing great—thanks for asking. How are you doing? Love your aim to prepare for exams. Here’s a practical, no-fluzz plan for your 5 hours today to keep you moving steadily.\n\nToday’s 5-hour plan (with short breaks between blocks)\n- Block 1 (50 min) Subject 1: Focus on 1–2 key topics for the June 15 exam. Create a concise 5-bullet summary for each topic and solve 3 representative practice problems. Quick check: what’s your top weak spot in Subject 1 right now?\n- Break (10 min)\n- Block 2 (50 min) Logic: Tackle hard topics. Do 8–12 problems, and jot down the main mistakes you’re making. Create a short note for each mistake so you don’t repeat it.\n- Break (10 min)\n- Block 3 (50 min) Subject 1: Targeted practice on your identified weak area. Do 15–20 problems, review solutions, and annotate where you went wrong.\n- Break (10 min)\n- Block 4 (50 min) Logic: Deep-dive review. Revisit core concepts, sketch a simple formula/map, and summarize one “cheat sheet” page you can flip through later.\n- Break (10 min)\n- Block 5 (50 min) Subject 1: Final wrap-up. Do a quick self-test (5–10 problems) and create 6 flashcards or a one-page recap of today’s learning. End with a concrete plan for tomorrow (which topics to tackle first).\n\nTips to stay on track\n- Start clearly with one concrete goal per block (e.g., “finish Topic A summary and 3 problems”).\n- If you’re ever stuck, switch to a quick “explain it to a peer” style note for 2 minutes; that helps solidify understanding.\n- End with a 2-minute read of your notes to lock in what you learned.\n\nIf you want, tell me the exact topics you’re covering in Subject 1 and the hardest concepts in Logic. I can tailor today’s blocks precisely to those items. You’ve got this—one focused day at a time, and you’ll see progress.",
+      "createdDate": "2026-04-25T14:06:41.992Z",
+      "source": "puter",
+      "model": "gpt-5-nano"
+    },
+    {
+      "id": "chat_21fe3d4983c5b24c",
+      "userEmail": "adamcanvatest111@gmail.com",
+      "role": "user",
+      "message": "do you type other things",
+      "createdDate": "2026-04-25T14:17:05.694Z"
+    },
+    {
+      "id": "chat_656645386bff8c53",
+      "userEmail": "adamcanvatest111@gmail.com",
+      "role": "assistant",
+      "message": "Yes—I can help with a lot more than just typing. As your study coach, I can:\n\n- Create a personalized 5-hour/day study plan aligned to your deadlines (Subject 1 exam on 2026-06-15; Logic exam on 2026-07-14).\n- Break topics into manageable chunks, prioritize harder topics, and set weekly goals.\n- Generate timed, exam-style practice questions and quick quizzes; create flashcards.\n- Explain concepts step-by-step with worked examples.\n- Summarize notes and build concise outlines or cheatsheets.\n- Track your progress, adjust the plan weekly, and set reminders.\n- Simulate full-length practice tests and review results to improve.\n\nWould you like me to draft a first-pass plan now? Do you want me to focus more on Subject 1 or Logic first, or run both in parallel? Any topic specifics, class notes, or preferred study methods (Pomodoro, spaced repetition, active recall) I should use?",
+      "createdDate": "2026-04-25T14:17:05.694Z",
+      "source": "puter",
+      "model": "gpt-5-nano"
+    },
+    {
+      "id": "chat_7bb58c25675a27eb",
+      "userEmail": "cute_182684029@example.com",
+      "role": "user",
+      "message": "Motivate me",
+      "createdDate": "2026-04-25T15:39:41.095Z"
+    },
+    {
+      "id": "chat_02d6bc95338d0846",
+      "userEmail": "cute_182684029@example.com",
+      "role": "assistant",
+      "message": "Cute, a good next step is to focus on Biology first because its exam is closer. Aim for one short focused block today, then ask me for help with revision strategy, weak topics, or how to divide your week.",
+      "createdDate": "2026-04-25T15:39:41.095Z",
+      "source": "local",
+      "model": null
+    },
+    {
+      "id": "chat_1e9f82d4c8fd63fc",
+      "userEmail": "adamkirito987@gmail.com",
+      "role": "user",
+      "message": "Make my plan easier 🧘",
+      "createdDate": "2026-04-25T15:42:04.270Z"
+    },
+    {
+      "id": "chat_67f09f1683226256",
+      "userEmail": "adamkirito987@gmail.com",
+      "role": "assistant",
+      "message": "You’ve got this, Adama. Let’s keep it super simple and still powerful. Here’s an easy, repeatable plan that fits your 5 hours a day and your exam on 2026-06-15.\n\nPlan at a glance\n- Duration: about 7 weeks, with a built-in quick wrap-up week before the exam.\n- Daily rhythm (5 hours): \n  - 15 min: quick recap of yesterday\n  - 90 min: core concept study (theory, notes, short readings)\n  - 90 min: practical task (case, design thinking activity, mini-prototype)\n  - 60 min: exam-style practice question or short quiz\n  - 60 min: review + plan for next day\n- Weekly focus:\n  - Week 1: Foundations – stages of design thinking, empathy, reframing problems\n  - Week 2: Ideation – generating ideas, selecting concepts\n  - Week 3: Prototyping – quick prototypes, low-fidelity tests\n  - Week 4: Testing & case studies – feedback, real-world examples\n  - Week 5: Exam practice – memory aids, structured answers\n  - Week 6: Full practice exams – targeted review of weak areas\n  - Week 7: Final polish + confidence boost (buffer week)\n- Weekly check-in: quick 10-minute review on Friday to adjust next week if something isn’t clicking.\n\nStarter week outline (example you can copy each week)\n- Monday: \n  - 15 min recap\n  - 90 min concept study (new topic or chapter)\n  - 90 min practical task (case or simple design activity)\n  - 60 min practice question\n  - 60 min review/plan\n- Tuesday–Thursday: Repeat the same blocks with a fresh topic or case each day\n- Friday: 15 min recap, 90 min review of week notes, 90 min light practice or a low-stakes case, 60 min summary + plan for next week\n- Weekend (optional): 1–2 hours optional catch-up or reflection\n\nTips to keep it easy and sustainable\n- Use one central space: a single notebook or digital doc for quick notes, diagrams, and your “why this matters” statements.\n- Keep tasks small and tangible: one mini-prototype, one case study, one exam-style answer.\n- If energy dips, swap a 90-min block for two 45-min blocks with a 5–10 min break.\n- Track progress with a simple checkbox per day or a one-line journal: “Key takeaway from today?” “One question for tomorrow.”\n- If you miss a day, don’t overcram—just move on to the next day’s plan. Consistency beats perfection.\n\nNext steps\n- Want, I can turn this into a printable 7-week calendar with dates and daily tasks tailored to היום (today) and your actual class schedule.\n- If you share any particular topics you find tricky, I’ll adjust Week 1 or Week 2 to emphasize them.\n\nYou’re building a solid, exam-ready way of thinking. Stay steady, and you’ll get there. If you’d like, tell me your preferred start date and any fixed days off, and I’ll customize the calendar for you.",
+      "createdDate": "2026-04-25T15:42:04.270Z",
+      "source": "puter",
+      "model": "gpt-5-nano"
+    },
+    {
+      "id": "chat_eca4847c26b2ccb1",
+      "userEmail": "spark_1994201339@example.com",
+      "role": "user",
+      "message": "Motivate me",
+      "createdDate": "2026-04-25T15:56:04.145Z"
+    },
+    {
+      "id": "chat_d5fecf77663b2eb9",
+      "userEmail": "spark_1994201339@example.com",
+      "role": "assistant",
+      "message": "Spark, a good next step is to focus on Math first because its exam is closer. Aim for one short focused block today, then ask me for help with revision strategy, weak topics, or how to divide your week.",
+      "createdDate": "2026-04-25T15:56:04.145Z",
+      "source": "local",
+      "model": null
+    }
+  ]
+}
